@@ -1,0 +1,107 @@
+---
+import Base from '../layouts/Base.astro';
+import Footer from '../components/Footer.astro';
+import FeaturedCard from '../components/FeaturedCard.astro';
+import { SITE } from '../config';
+import { allPosts } from '../lib/posts';
+
+const posts = await allPosts();
+const featuredPl = posts.find((p) => p.data.lang === 'pl');
+const featuredEn = posts.find((p) => p.data.lang === 'en');
+---
+<Base title={`About me — ${SITE.title}`} active="o-mnie">
+  <main class="page about">
+    <div class="lang-block" data-lang="pl">
+      <header class="about-header">
+        <div class="avatar">zdjęcie<br />autora</div>
+        <div class="about-intro">
+          <p class="about-comment">// „j" jak w dobrych bibliotekach: jUnit, jOOQ, jRG</p>
+          <h1 class="about-title">Cześć, jestem Robert.</h1>
+          <p>
+            Backend w Javie — od zawsze Spring, od niedawna rozglądam się za alternatywami. Architektura
+            heksagonalna, DDD i przekonanie, że dobry kod czyta się jak dobrą prozę. Piszę po polsku i po
+            angielsku — zależnie od tematu i humoru.
+          </p>
+        </div>
+      </header>
+
+      <section>
+        <h2 class="section-heading">// czym się zajmuję</h2>
+        <div class="cards-grid">
+          <div class="about-card">
+            <p class="card-title">programowanie</p>
+            <p>Moja wizytówka. Backend w Javie, porty i adaptery, agregaty które naprawdę coś agregują.</p>
+          </div>
+          <div class="about-card">
+            <p class="card-title">f1</p>
+            <p>Na pauzie. Wrócę, jak regulacje przestaną psuć wyścigi. Kiedyś to było.</p>
+          </div>
+          <div class="about-card">
+            <p class="card-title">diy</p>
+            <p>Refaktoring, ale w mieszkaniu. Wiertarka to taki debugger do ścian.</p>
+          </div>
+          <div class="about-card">
+            <p class="card-title">gotowanie</p>
+            <p>Od czasu do czasu coś mi się uda. Trzymam się przepisu jak specyfikacji.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="lang-block" data-lang="en" hidden>
+      <header class="about-header">
+        <div class="avatar">author's<br />photo</div>
+        <div class="about-intro">
+          <p class="about-comment">// "j" as in good libraries: jUnit, jOOQ, jRG</p>
+          <h1 class="about-title">Hi, I'm Robert.</h1>
+          <p>
+            Java backend — Spring since forever, lately looking around at the alternatives. Hexagonal
+            architecture, DDD and the conviction that good code reads like good prose. I write in Polish
+            and in English — depending on the topic and the mood.
+          </p>
+        </div>
+      </header>
+
+      <section>
+        <h2 class="section-heading">// what I do</h2>
+        <div class="cards-grid">
+          <div class="about-card">
+            <p class="card-title">programming</p>
+            <p>My calling card. Java backends, ports and adapters, aggregates that actually aggregate.</p>
+          </div>
+          <div class="about-card">
+            <p class="card-title">f1</p>
+            <p>On hold. I'll be back when the regulations stop ruining the racing. It used to be great.</p>
+          </div>
+          <div class="about-card">
+            <p class="card-title">diy</p>
+            <p>Refactoring, but for the apartment. A drill is just a debugger for walls.</p>
+          </div>
+          <div class="about-card">
+            <p class="card-title">cooking</p>
+            <p>Every now and then something works out. I follow the recipe like a spec.</p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    {featuredPl && <FeaturedCard post={featuredPl} small showDate={false} />}
+    {featuredEn && <FeaturedCard post={featuredEn} small showDate={false} hidden />}
+
+    <Footer />
+  </main>
+  <script>
+    import { getLang } from '../scripts/site.js';
+    const applyLang = () => {
+      const lang = getLang();
+      for (const block of document.querySelectorAll('.lang-block')) {
+        block.hidden = block.dataset.lang !== lang;
+      }
+      for (const card of document.querySelectorAll('.featured-card[data-lang]')) {
+        card.hidden = card.dataset.lang !== lang;
+      }
+    };
+    document.addEventListener('langchange', applyLang);
+    applyLang();
+  </script>
+</Base>

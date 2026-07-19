@@ -1,0 +1,118 @@
+---
+import { render } from 'astro:content';
+import Base from '../../../layouts/Base.astro';
+import Footer from '../../../components/Footer.astro';
+import { SITE } from '../../../config';
+import { allPosts, slugOf, urlOf, excerptOf, readingTimeOf, updatedOf, fmtDate, type Post } from '../../../lib/posts';
+
+export async function getStaticPaths() {
+  const posts = await allPosts();
+  return posts.map((post) => ({ params: { lang: post.data.lang, slug: slugOf(post) }, props: { post } }));
+}
+
+const { post } = Astro.props as { post: Post };
+const posts = await allPosts();
+const slug = slugOf(post);
+const counterpartPost = posts.find((p) => slugOf(p) === slug && p.data.lang !== post.data.lang);
+const sameLang = posts.filter((p) => p.data.lang === post.data.lang);
+const idx = sameLang.findIndex((p) => p.id === post.id);
+const newer = idx > 0 ? sameLang[idx - 1] : null;
+const older = idx >= 0 && idx < sameLang.length - 1 ? sameLang[idx + 1] : null;
+const badge = counterpartPost ? 'PL/EN' : post.data.lang.toUpperCase();
+const updated = updatedOf(post);
+const historyUrl = SITE.repoUrl ? `${SITE.repoUrl}/commits/main/src/content/posts/${post.id}.md` : null;
+const counterpart = {
+  [post.data.lang]: urlOf(post),
+  ...(counterpartPost ? { [counterpartPost.data.lang]: urlOf(counterpartPost) } : {}),
+};
+const { Content } = await render(post);
+// post chrome speaks the post's language
+const T = post.data.lang === 'pl'
+  ? {
+      back: '← wpisy',
+      updated: 'zaktualizowano',
+      comments: '// komentarze',
+      noOlder: '← starszych wpisów brak',
+      noNewer: 'nowszych wpisów brak →',
+      history: 'historia zmian ↗',
+    }
+  : {
+      back: '← posts',
+      updated: 'updated',
+      comments: '// comments',
+      noOlder: '← no older posts',
+      noNewer: 'no newer posts →',
+      history: 'change history ↗',
+    };
+---
+<Base
+  title={`${post.data.title} — ${SITE.title}`}
+  description={excerptOf(post)}
+  lang={post.data.lang}
+  active="wpisy"
+  counterpart={counterpart}
+  canonicalUrl={post.data.canonicalUrl}
+>
+  <main class="page post">
+    <p class="back-link mono"><a href="/">{T.back}</a></p>
+
+    <header class="post-header">
+      <h1 class="post-title">{post.data.title}</h1>
+      <div class="post-meta mono">
+        <span>{fmtDate(post.data.date)}</span><span>·</span><span>{readingTimeOf(post)} min</span><span>·</span>
+        {updated && <><span class="post-updated">{T.updated} {fmtDate(updated)}</span><span>·</span></>}
+        <span class="lang-badge">{badge}</span>
+        {post.data.draft && <span class="lang-badge draft-badge">szkic</span>}
+        {post.data.tags.map((t) => <span class="tag-chip">#{t}</span>)}
+      </div>
+    </header>
+
+    {!counterpart.pl && (
+      <p class="translation-notice mono-comment" id="no-pl-notice" hidden>
+        // brak polskiej wersji tego wpisu — NoSuchTranslationException
+      </p>
+    )}
+    {!counterpart.en && (
+      <p class="translation-notice mono-comment" id="no-en-notice" hidden>
+        // no English version of this post yet — NoSuchTranslationException
+      </p>
+    )}
+
+    <article class="post-body">
+      <Content />
+    </article>
+
+    {historyUrl && (
+      <p class="post-history mono"><a href={historyUrl}>{T.history}</a></p>
+    )}
+
+    <section class="comments">
+      <h2 class="section-heading">{T.comments}</h2>
+      {SITE.disqusShortname ? (
+        <div id="disqus_thread"></div>
+      ) : (
+        <div class="disqus-fallback">// Disqus nie skonfigurowany — ustaw disqusShortname w src/config.ts</div>
+      )}
+    </section>
+    {SITE.disqusShortname && (
+      <script is:inline define:vars={{ shortname: SITE.disqusShortname, identifier: slug, pageTitle: post.data.title }}>
+        window.disqus_config = function () {
+          this.page.url = location.href;
+          this.page.identifier = identifier;
+          this.page.title = pageTitle;
+        };
+        const s = document.createElement('script');
+        s.src = 'https://' + shortname + '.disqus.com/embed.js';
+        s.setAttribute('data-timestamp', +new Date());
+        document.body.appendChild(s);
+      </script>
+    )}
+
+    <nav class="post-nav mono">
+      {older ? <a href={urlOf(older)}>← {older.data.title}</a> : <span>{T.noOlder}</span>}
+      {newer ? <a href={urlOf(newer)}>{newer.data.title} →</a> : <span>{T.noNewer}</span>}
+    </nav>
+
+    <Footer />
+  </main>
+</Base>

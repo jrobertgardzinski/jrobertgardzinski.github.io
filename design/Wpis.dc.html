@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+html, body { margin: 0; padding: 0; }
+body {
+  --bg: #2B2B2B; --panel: #3C3F41; --panel2: #313335; --border: #4E5254;
+  --text: #BBBBBB; --text-strong: #E8E8E8; --muted: #808080;
+  --accent: #6897BB; --accent-strong: #89B0D0;
+  --kw: #CC7832; --str: #6A8759; --cmt: #808080; --num: #6897BB; --fn: #FFC66D; --ann: #BBB529; --field: #9876AA;
+  --sel: rgba(104,151,187,.18);
+  background: var(--bg); color: var(--text);
+}
+body[data-theme="light"] {
+  --bg: #F7F8FA; --panel: #FFFFFF; --panel2: #EDEFF2; --border: #D4D7DC;
+  --text: #33383D; --text-strong: #080808; --muted: #8C8C8C;
+  --accent: #1B3E7A; --accent-strong: #0033B3;
+  --kw: #0033B3; --str: #067D17; --cmt: #8C8C8C; --num: #1750EB; --fn: #00627A; --ann: #9E880D; --field: #871094;
+  --sel: rgba(0,51,179,.08);
+}
+a { color: var(--accent-strong); text-decoration: none; }
+a:hover { color: var(--fn); text-decoration: underline; }
+::selection { background: var(--sel); }
+</style>
+</helmet>
+<div style="min-height:100vh;font-family:'IBM Plex Sans',sans-serif;font-size:15px;line-height:1.55;display:flex;flex-direction:column;align-items:center">
+  <nav style="width:100%;box-sizing:border-box;background:var(--panel);border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px;padding:10px 16px;font-family:'JetBrains Mono',monospace;font-size:13px">
+    <a href="Strona główna.dc.html" style="display:flex;align-items:center;gap:10px;color:var(--text-strong);font-weight:700;font-size:14px" style-hover="text-decoration:none">
+      <span style="width:26px;height:26px;background:var(--panel2);border:1px solid var(--border);display:grid;place-items:center;border-radius:4px;font-size:12px;font-weight:700"><span><span style="color:var(--text-strong)">j</span><span style="color:#E05555">R</span><span style="color:#4CAF50">G</span></span></span>
+      jRobertGardzinski
+    </a>
+    <div style="display:flex;flex-wrap:wrap;gap:10px 16px;margin-left:auto;align-items:center">
+      <a href="Strona główna.dc.html" style="color:var(--text-strong);border-bottom:2px solid var(--kw);padding-bottom:2px" style-hover="text-decoration:none">wpisy</a>
+      <a href="Strona główna.dc.html" style="color:var(--text)">tagi</a>
+      <a href="O mnie.dc.html" style="color:var(--text)">o-mnie</a>
+      <button onClick="{{ toggleTheme }}" title="Przełącz motyw" style="cursor:pointer;background:var(--panel2);border:1px solid var(--border);color:var(--text-strong);border-radius:4px;padding:4px 10px;min-width:72px;font-family:'JetBrains Mono',monospace;font-size:12px" style-hover="border-color:var(--accent)">{{ themeLabel }}</button>
+      <div style="display:flex;border:1px solid var(--border);border-radius:4px;overflow:hidden">
+        <button onClick="{{ setPl }}" style="cursor:pointer;border:none;padding:4px 9px;font-family:'JetBrains Mono',monospace;font-size:12px;background:{{ plBg }};color:{{ plColor }}">PL</button>
+        <button onClick="{{ setEn }}" style="cursor:pointer;border:none;border-left:1px solid var(--border);padding:4px 9px;font-family:'JetBrains Mono',monospace;font-size:12px;background:{{ enBg }};color:{{ enColor }}">EN</button>
+      </div>
+    </div>
+  </nav>
+
+  <main style="width:100%;max-width:760px;box-sizing:border-box;padding:32px 24px 64px;display:flex;flex-direction:column;gap:24px">
+
+    <p style="margin:0;font-family:'JetBrains Mono',monospace;font-size:12px"><a href="Strona główna.dc.html" style="color:var(--muted)">← wpisy</a></p>
+
+    <header style="display:flex;flex-direction:column;gap:10px">
+      <h1 style="margin:0;font-size:clamp(26px,7vw,34px);line-height:1.15;color:var(--text-strong);letter-spacing:-.01em">Hello World</h1>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted)">
+        <span>2026-07-17</span><span>·</span><span>3 min</span><span>·</span>
+        <span style="color:var(--ann);border:1px solid var(--border);border-radius:3px;padding:1px 6px">PL/EN</span>
+        <span style="background:var(--panel2);border:1px solid var(--border);border-radius:3px;padding:2px 8px;color:var(--accent-strong)">#hello-world</span>
+        <span style="background:var(--panel2);border:1px solid var(--border);border-radius:3px;padding:2px 8px;color:var(--accent-strong)">#claude</span>
+      </div>
+    </header>
+
+    <sc-if value="{{ isPl }}" hint-placeholder-val="{{ true }}">
+    <article style="display:flex;flex-direction:column;gap:16px;font-size:15.5px;line-height:1.7;color:var(--text);text-wrap:pretty">
+      <p style="margin:0">Każdy blog programisty musi zacząć się tak samo. Tradycja to tradycja:</p>
+
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:6px;overflow:hidden">
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 14px;background:var(--panel2);border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted)">HelloWorld.java</div>
+        <pre style="margin:0;padding:16px 18px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.65;overflow-x:auto;color:var(--text)"><code><span style="color:var(--kw)">void</span> <span style="color:var(--fn)">main</span>() {
+    IO.<span style="color:var(--fn)">println</span>(<span style="color:var(--str)">"Hello, World!"</span>);  <span style="color:var(--cmt)">// tak, w nowej Javie to naprawdę tyle</span>
+}</code></pre>
+      </div>
+
+      <p style="margin:0">Nazywam się Robert, piszę backend w Javie i to jest moja wizytówka. Będzie o architekturze heksagonalnej, o DDD traktowanym serio (agregaty, które naprawdę czegoś pilnują, a nie worki na settery) i o frameworkach: od zawsze robię w Springu, a od niedawna odkrywam alternatywy — Quarkus, Micronaut, wpadły mi też jakieś Helidony i inne wynalazki. Sprawdzę je za was. Część wpisów po polsku, część po angielsku — zależnie od tematu.</p>
+
+      <h2 style="margin:8px 0 0;font-size:21px;color:var(--text-strong)">Pełna transparentność</h2>
+      <p style="margin:0">Tę stronę zaprojektował i napisał mi <a href="https://claude.ai">Claude</a>. Ja mówiłem, co chcę (czerń, szarość, granat, klimat IntelliJ), on pisał. Trochę jak code review na odwrót — i szczerze? Wyszło szybciej niż moje typowe „jeszcze tylko poprawię CSS".</p>
+      <p style="margin:0">To zresztą dobry temat na start: jak zmienia się nasza robota, kiedy część kodu piszą modele. Spoiler — architektura robi się <em>ważniejsza</em>, nie mniej ważna. Ktoś musi wiedzieć, gdzie kończy się domena, a zaczyna adapter. O tym będzie następny wpis.</p>
+
+      <h2 style="margin:8px 0 0;font-size:21px;color:var(--text-strong)">Co dalej</h2>
+      <p style="margin:0">Na warsztacie: <strong style="color:var(--text-strong)">Hexagon w Springu</strong> — porty, adaptery i zero magii. Jeśli chcesz zgłosić temat albo się pokłócić o DDD, pisz: <a href="mailto:jrobertgardzinski@gmail.com">jrobertgardzinski@gmail.com</a>.</p>
+      <p style="margin:0;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--cmt)">// kompiluje się. shipujemy.</p>
+    </article>
+    </sc-if>
+    <sc-if value="{{ isEn }}" hint-placeholder-val="{{ false }}">
+    <article style="display:flex;flex-direction:column;gap:16px;font-size:15.5px;line-height:1.7;color:var(--text);text-wrap:pretty">
+      <p style="margin:0">Every developer blog has to start the same way. Tradition is tradition:</p>
+      <div style="background:var(--panel);border:1px solid var(--border);border-radius:6px;overflow:hidden">
+        <div style="display:flex;align-items:center;gap:8px;padding:6px 14px;background:var(--panel2);border-bottom:1px solid var(--border);font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--muted)">HelloWorld.java</div>
+        <pre style="margin:0;padding:16px 18px;font-family:'JetBrains Mono',monospace;font-size:13.5px;line-height:1.65;overflow-x:auto;color:var(--text)"><code><span style="color:var(--kw)">void</span> <span style="color:var(--fn)">main</span>() {
+    IO.<span style="color:var(--fn)">println</span>(<span style="color:var(--str)">"Hello, World!"</span>);  <span style="color:var(--cmt)">// yes, in modern Java that's really it</span>
+}</code></pre>
+      </div>
+      <p style="margin:0">My name is Robert, I write Java backends and this blog is my business card. Expect hexagonal architecture, DDD taken seriously (aggregates that actually guard something, not bags of setters) and frameworks: I've always worked in Spring, and lately I'm exploring the alternatives — Quarkus, Micronaut, plus some Helidons and other curiosities that crossed my radar. I'll test them so you don't have to. Some posts in Polish, some in English — depending on the topic.</p>
+      <h2 style="margin:8px 0 0;font-size:21px;color:var(--text-strong)">Full transparency</h2>
+      <p style="margin:0">This site was designed and written for me by <a href="https://claude.ai">Claude</a>. I said what I wanted (black, grey, navy, IntelliJ vibes), it wrote the code. A bit like code review in reverse — and honestly? Faster than my usual "just one more CSS tweak".</p>
+      <p style="margin:0">Which is a good opening theme: how our job changes when models write part of the code. Spoiler — architecture becomes <em>more</em> important, not less. Someone has to know where the domain ends and the adapter begins. That's the next post.</p>
+      <h2 style="margin:8px 0 0;font-size:21px;color:var(--text-strong)">What's next</h2>
+      <p style="margin:0">On the workbench: <strong style="color:var(--text-strong)">Hexagonal architecture in Spring</strong> — ports, adapters, zero magic. Want to suggest a topic or argue about DDD? Write me: <a href="mailto:jrobertgardzinski@gmail.com">jrobertgardzinski@gmail.com</a>.</p>
+      <p style="margin:0;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--cmt)">// it compiles. ship it.</p>
+    </article>
+    </sc-if>
+
+    <section style="border-top:1px solid var(--border);padding-top:18px">
+      <h2 style="margin:0 0 12px;font-size:13px;font-family:'JetBrains Mono',monospace;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">// komentarze</h2>
+      <sc-if value="{{ hasDisqus }}" hint-placeholder-val="{{ false }}">
+        <div id="disqus_thread" style="background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:16px 18px"></div>
+      </sc-if>
+      <sc-if value="{{ noDisqus }}" hint-placeholder-val="{{ true }}">
+        <div style="background:var(--panel);border:1px dashed var(--border);border-radius:6px;padding:16px 18px;font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--muted)">// Disqus nie skonfigurowany — ustaw `disqusShortname` w Tweaks (shortname z disqus.com/admin)</div>
+      </sc-if>
+    </section>
+
+    <nav style="border-top:1px solid var(--border);padding-top:14px;display:flex;justify-content:space-between;gap:8px;font-family:'JetBrains Mono',monospace;font-size:12.5px">
+      <span style="color:var(--muted)">← starszych wpisów brak</span>
+      <a href="#">Hexagon w Springu →</a>
+    </nav>
+
+    <footer style="border-top:1px solid var(--border);padding-top:16px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)">
+      <a href="mailto:jrobertgardzinski@gmail.com">jrobertgardzinski@gmail.com</a>
+      <span><a href="#">github</a> · <a href="#">linkedin</a> · <a href="#">rss</a></span>
+    </footer>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;defaultTheme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;},&quot;disqusShortname&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;rob&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { theme: null, lang: 'pl' };
+  componentDidMount() {
+    const t = this.state.theme ?? this.props.defaultTheme ?? 'dark';
+    document.body.dataset.theme = t;
+    if (this.state.theme === null) this.setState({ theme: t });
+    this.loadDisqus();
+  }
+  loadDisqus() {
+    const shortname = this.props.disqusShortname;
+    if (!shortname || this._disqusLoaded) return;
+    this._disqusLoaded = true;
+    window.disqus_config = function () {
+      this.page.url = location.href;
+      this.page.identifier = 'hello-world';
+      this.page.title = 'Hello World';
+    };
+    const s = document.createElement('script');
+    s.src = 'https://' + shortname + '.disqus.com/embed.js';
+    s.setAttribute('data-timestamp', +new Date());
+    document.body.appendChild(s);
+  }
+  componentDidUpdate() {
+    if (this.state.theme) document.body.dataset.theme = this.state.theme;
+  }
+  renderVals() {
+    const theme = this.state.theme ?? this.props.defaultTheme ?? 'dark';
+    return {
+      themeLabel: theme === 'dark' ? 'Darcula' : 'Light',
+      toggleTheme: () => this.setState({ theme: theme === 'dark' ? 'light' : 'dark' }),
+      hasDisqus: !!this.props.disqusShortname,
+      noDisqus: !this.props.disqusShortname,
+      isPl: this.state.lang === 'pl',
+      isEn: this.state.lang === 'en',
+      setPl: () => this.setState({ lang: 'pl' }),
+      setEn: () => this.setState({ lang: 'en' }),
+      plBg: this.state.lang === 'pl' ? 'var(--sel)' : 'var(--panel2)',
+      plColor: this.state.lang === 'pl' ? 'var(--accent-strong)' : 'var(--muted)',
+      enBg: this.state.lang === 'en' ? 'var(--sel)' : 'var(--panel2)',
+      enColor: this.state.lang === 'en' ? 'var(--accent-strong)' : 'var(--muted)',
+    };
+  }
+}
+</script>
+</body>
+</html>

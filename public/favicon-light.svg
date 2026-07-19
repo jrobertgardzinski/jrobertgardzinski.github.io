@@ -1,0 +1,4 @@
+﻿<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <rect x="1" y="1" width="62" height="62" rx="12" fill="#FFFFFF" stroke="#D4D7DC" stroke-width="2"/>
+  <text x="32" y="43" text-anchor="middle" font-family="'JetBrains Mono',Consolas,'Cascadia Mono',Menlo,monospace" font-size="30" font-weight="700"><tspan fill="#000000" font-size="24">j</tspan><tspan fill="#800000">R</tspan><tspan fill="#008000">G</tspan></text>
+</svg>

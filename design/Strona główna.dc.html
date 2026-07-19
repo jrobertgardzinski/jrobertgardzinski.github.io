@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+html, body { margin: 0; padding: 0; }
+body {
+  --bg: #2B2B2B; --panel: #3C3F41; --panel2: #313335; --border: #4E5254;
+  --text: #BBBBBB; --text-strong: #E8E8E8; --muted: #808080;
+  --accent: #6897BB; --accent-strong: #89B0D0;
+  --kw: #CC7832; --str: #6A8759; --cmt: #808080; --num: #6897BB; --fn: #FFC66D; --ann: #BBB529; --field: #9876AA;
+  --sel: rgba(104,151,187,.18);
+  background: var(--bg); color: var(--text);
+}
+body[data-theme="light"] {
+  --bg: #F7F8FA; --panel: #FFFFFF; --panel2: #EDEFF2; --border: #D4D7DC;
+  --text: #33383D; --text-strong: #080808; --muted: #8C8C8C;
+  --accent: #1B3E7A; --accent-strong: #0033B3;
+  --kw: #0033B3; --str: #067D17; --cmt: #8C8C8C; --num: #1750EB; --fn: #00627A; --ann: #9E880D; --field: #871094;
+  --sel: rgba(0,51,179,.08);
+}
+a { color: var(--accent-strong); text-decoration: none; }
+a:hover { color: var(--fn); text-decoration: underline; }
+::selection { background: var(--sel); }
+</style>
+</helmet>
+<div style="min-height:100vh;font-family:'IBM Plex Sans',sans-serif;font-size:15px;line-height:1.55;display:flex;flex-direction:column;align-items:center">
+  <nav style="width:100%;box-sizing:border-box;background:var(--panel);border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px;padding:10px 16px;font-family:'JetBrains Mono',monospace;font-size:13px">
+    <a href="Strona główna.dc.html" style="display:flex;align-items:center;gap:10px;color:var(--text-strong);font-weight:700;font-size:14px" style-hover="text-decoration:none">
+      <span style="width:26px;height:26px;background:var(--panel2);border:1px solid var(--border);display:grid;place-items:center;border-radius:4px;font-size:12px;font-weight:700"><span><span style="color:var(--text-strong)">j</span><span style="color:#E05555">R</span><span style="color:#4CAF50">G</span></span></span>
+      jRobertGardzinski
+    </a>
+    <div style="display:flex;flex-wrap:wrap;gap:10px 16px;margin-left:auto;align-items:center">
+      <a href="Strona główna.dc.html" style="color:var(--text-strong);border-bottom:2px solid var(--kw);padding-bottom:2px" style-hover="text-decoration:none">wpisy</a>
+      <button onClick="{{ goToFilters }}" style="cursor:pointer;background:none;border:none;padding:0;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:13px" style-hover="color:var(--fn)">tagi</button>
+      <a href="O mnie.dc.html" style="color:var(--text)">o-mnie</a>
+      <button onClick="{{ toggleTheme }}" title="Przełącz motyw" style="cursor:pointer;background:var(--panel2);border:1px solid var(--border);color:var(--text-strong);border-radius:4px;padding:4px 10px;min-width:72px;font-family:'JetBrains Mono',monospace;font-size:12px" style-hover="border-color:var(--accent)">{{ themeLabel }}</button>
+      <div style="display:flex;border:1px solid var(--border);border-radius:4px;overflow:hidden">
+        <button onClick="{{ setPl }}" style="cursor:pointer;border:none;padding:4px 9px;font-family:'JetBrains Mono',monospace;font-size:12px;background:{{ plBg }};color:{{ plColor }}">PL</button>
+        <button onClick="{{ setEn }}" style="cursor:pointer;border:none;border-left:1px solid var(--border);padding:4px 9px;font-family:'JetBrains Mono',monospace;font-size:12px;background:{{ enBg }};color:{{ enColor }}">EN</button>
+      </div>
+    </div>
+  </nav>
+
+  <main style="width:100%;max-width:880px;box-sizing:border-box;padding:28px 24px 64px;display:flex;flex-direction:column;gap:22px">
+
+    <section style="background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--kw);border-radius:6px;padding:18px 22px">
+      <p style="margin:0;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">najnowszy wpis · {{ featured.lang }}</p>
+      <h2 style="margin:6px 0 4px;font-size:clamp(19px,5vw,22px);line-height:1.25;color:var(--text-strong)"><a href="Wpis.dc.html" style="color:var(--text-strong)" style-hover="color:var(--accent-strong);text-decoration:none">{{ featured.title }}</a></h2>
+      <p style="margin:0 0 10px;font-size:14px;color:var(--text)">{{ featured.excerpt }}</p>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-family:'JetBrains Mono',monospace;font-size:11.5px">
+        <span style="color:var(--accent-strong)">{{ featured.tagLine }}</span>
+        <span style="margin-left:auto;color:var(--muted)">{{ featured.date }} · {{ featured.read }} min</span>
+      </div>
+    </section>
+
+    <section style="display:flex;flex-direction:column;gap:10px">
+      <div style="display:flex;align-items:center;gap:8px;background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:8px 12px;font-family:'JetBrains Mono',monospace;font-size:13px">
+        <span style="color:var(--muted)">&gt;</span>
+        <input value="{{ query }}" onChange="{{ setQuery }}" ref="{{ searchRef }}" placeholder="szukaj wpisów…" style="flex:1;background:transparent;border:none;outline:none;color:var(--text-strong);font-family:'JetBrains Mono',monospace;font-size:13px">
+        <span style="color:var(--muted);font-size:11.5px">{{ resultCount }} wpisów</span>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-family:'JetBrains Mono',monospace;font-size:11.5px">
+        <span style="color:var(--muted);font-size:11px;min-width:66px">działy:</span>
+        <sc-for list="{{ sections }}" as="sec" hint-placeholder-count="4">
+          <button onClick="{{ sec.toggle }}" style="cursor:pointer;background:{{ sec.bg }};border:1px solid {{ sec.border }};border-radius:3px;padding:3px 10px;color:{{ sec.color }};font-family:'JetBrains Mono',monospace;font-size:11.5px" style-hover="border-color:var(--kw)">{{ sec.name }}</button>
+        </sc-for>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-family:'JetBrains Mono',monospace;font-size:11.5px">
+        <span style="color:var(--muted);font-size:11px;min-width:66px">projekty:</span>
+        <sc-for list="{{ projects }}" as="pr" hint-placeholder-count="3">
+          <button onClick="{{ pr.toggle }}" style="cursor:pointer;background:{{ pr.bg }};border:1px solid {{ pr.border }};border-radius:3px;padding:3px 10px;color:{{ pr.color }};font-family:'JetBrains Mono',monospace;font-size:11.5px" style-hover="border-color:var(--field)">~/{{ pr.name }}</button>
+        </sc-for>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-family:'JetBrains Mono',monospace;font-size:11.5px">
+        <span style="color:var(--muted);font-size:11px;min-width:66px">tagi:</span>
+        <sc-for list="{{ tags }}" as="t" hint-placeholder-count="6">
+          <button onClick="{{ t.toggle }}" style="cursor:pointer;background:{{ t.bg }};border:1px solid {{ t.border }};border-radius:3px;padding:3px 10px;color:{{ t.color }};font-family:'JetBrains Mono',monospace;font-size:11.5px" style-hover="border-color:var(--accent)">#{{ t.name }}</button>
+        </sc-for>
+      </div>
+    </section>
+
+    <section style="display:flex;flex-direction:column">
+      <sc-for list="{{ posts }}" as="p" hint-placeholder-count="5">
+        <article style="border-bottom:1px solid var(--border);padding:14px 2px;display:flex;flex-direction:column;gap:5px">
+          <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+            <h3 style="margin:0;font-size:16.5px;line-height:1.3"><a href="#" style="color:var(--text-strong)" style-hover="color:var(--accent-strong);text-decoration:none">{{ p.title }}</a></h3>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:var(--ann);border:1px solid var(--border);border-radius:3px;padding:1px 6px">{{ p.lang }}</span>
+          </div>
+          <p style="margin:0;font-size:13.5px;color:var(--text)">{{ p.excerpt }}</p>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted)">
+            <span>{{ p.date }}</span><span>·</span><span>{{ p.read }} min</span><span>·</span>
+            <sc-for list="{{ p.tagList }}" as="pt" hint-placeholder-count="2">
+              <button onClick="{{ pt.toggle }}" style="cursor:pointer;background:none;border:none;padding:0;color:var(--accent-strong);font-family:'JetBrains Mono',monospace;font-size:11px" style-hover="color:var(--fn)">#{{ pt.name }}</button>
+            </sc-for>
+            <span style="color:var(--field)">{{ p.projectLine }}</span>
+          </div>
+        </article>
+      </sc-for>
+      <sc-if value="{{ empty }}" hint-placeholder-val="{{ false }}">
+        <p style="margin:20px 0;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--muted)">// brak wyników — NoSuchPostException</p>
+      </sc-if>
+      <sc-if value="{{ showPager }}" hint-placeholder-val="{{ false }}">
+        <div style="display:flex;gap:6px;align-items:center;justify-content:center;padding-top:18px;font-family:'JetBrains Mono',monospace;font-size:12.5px">
+          <button onClick="{{ prevPage }}" style="cursor:pointer;background:var(--panel);border:1px solid var(--border);border-radius:3px;padding:4px 10px;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:12.5px" style-hover="border-color:var(--accent);color:var(--accent-strong)">←</button>
+          <sc-for list="{{ pages }}" as="pg" hint-placeholder-count="2">
+            <button onClick="{{ pg.go }}" style="cursor:pointer;background:{{ pg.bg }};border:1px solid {{ pg.border }};border-radius:3px;padding:4px 10px;color:{{ pg.color }};font-family:'JetBrains Mono',monospace;font-size:12.5px" style-hover="border-color:var(--accent)">{{ pg.label }}</button>
+          </sc-for>
+          <button onClick="{{ nextPage }}" style="cursor:pointer;background:var(--panel);border:1px solid var(--border);border-radius:3px;padding:4px 10px;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:12.5px" style-hover="border-color:var(--accent);color:var(--accent-strong)">→</button>
+        </div>
+      </sc-if>
+    </section>
+
+    <footer style="border-top:1px solid var(--border);padding-top:16px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)">
+      <a href="mailto:jrobertgardzinski@gmail.com">jrobertgardzinski@gmail.com</a>
+      <span><a href="#">github</a> · <a href="#">linkedin</a> · <a href="#">rss</a></span>
+    </footer>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;defaultTheme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;},&quot;perPage&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:12,&quot;min&quot;:3,&quot;max&quot;:30,&quot;tsType&quot;:&quot;number&quot;}}">
+class Component extends DCLogic {
+  state = { theme: null, query: '', activeTags: [], activeProject: null, activeSection: null, page: 0, lang: 'pl' };
+  POSTS = [
+    { title: 'Hello World', lang: 'PL/EN', excerpt: 'Pierwszy wpis. O tym, co tu będzie: Java, hexagon, DDD — i o tym, że tę stronę napisał mi Claude.', date: '2026-07-17', read: 3, tags: ['hello-world', 'claude'], project: 'blog' },
+    { title: 'Hexagon w Springu: porty, adaptery i zero magii', lang: 'PL', excerpt: 'Jak poukładać moduły, żeby domena nie wiedziała, że istnieje HTTP — i dlaczego Spring wcale w tym nie przeszkadza.', date: '2026-07-12', read: 9, tags: ['spring', 'hexagonal', 'ddd'], project: 'hexagon-demo' },
+    { title: 'Aggregates that actually aggregate', lang: 'EN', excerpt: 'Most "aggregates" are just entity bags. How to find real invariants and draw boundaries that hold under load.', date: '2026-06-28', read: 12, tags: ['ddd', 'architektura'], project: 'hexagon-demo' },
+    { title: "Value Objects w Javie bez boilerplate'u", lang: 'PL', excerpt: 'Rekordy, walidacja w konstruktorze i dlaczego String to nie jest typ na numer NIP.', date: '2026-06-10', read: 6, tags: ['java', 'ddd'], project: 'hexagon-demo' },
+    { title: 'Spring vs Quarkus vs Micronaut: cold start story', lang: 'PL/EN', excerpt: 'Zmierzyłem, porównałem, zdziwiłem się. Liczby, wykresy, trochę GraalVM-a. Helidon poczeka w kolejce.', date: '2026-05-22', read: 10, tags: ['spring', 'quarkus', 'micronaut'], project: 'benchmarki' },
+    { title: 'Testy domeny bez mocków', lang: 'PL', excerpt: 'Jeśli mockujesz repozytorium w teście agregatu, to znak, że architektura przecieka. Red, green, refactor.', date: '2026-05-03', read: 7, tags: ['testy', 'ddd', 'hexagonal'], project: 'hexagon-demo' },
+    { title: 'Ports & adapters: where the domain ends', lang: 'EN', excerpt: 'A field guide to deciding what is a port, what is an adapter, and what is just a function.', date: '2026-04-15', read: 8, tags: ['hexagonal', 'architektura'], project: null },
+  ];
+  TAGS = ['java', 'spring', 'quarkus', 'micronaut', 'hexagonal', 'ddd', 'architektura', 'testy'];
+  PROJECTS = ['blog', 'hexagon-demo', 'benchmarki'];
+  SECTIONS = [
+    { id: 'it', pl: 'IT', en: 'IT' },
+    { id: 'f1', pl: 'F1', en: 'F1' },
+    { id: 'diy', pl: 'majsterkowanie', en: 'DIY' },
+    { id: 'cooking', pl: 'gotowanie', en: 'cooking' },
+  ];
+  componentDidMount() {
+    const t = this.state.theme ?? this.props.defaultTheme ?? 'dark';
+    document.body.dataset.theme = t;
+    if (this.state.theme === null) this.setState({ theme: t });
+  }
+  componentDidUpdate() {
+    if (this.state.theme) document.body.dataset.theme = this.state.theme;
+  }
+  renderVals() {
+    const theme = this.state.theme ?? this.props.defaultTheme ?? 'dark';
+    const q = this.state.query.toLowerCase();
+    const active = this.state.activeTags;
+    const lang = this.state.lang;
+    const all = this.POSTS.filter(p => {
+      const matchL = p.lang.toLowerCase().split('/').includes(lang);
+      const matchQ = !q || p.title.toLowerCase().includes(q) || p.excerpt.toLowerCase().includes(q) || p.tags.some(t => t.includes(q));
+      const matchT = active.length === 0 || active.every(t => p.tags.includes(t));
+      const matchP = !this.state.activeProject || p.project === this.state.activeProject;
+      const matchS = !this.state.activeSection || (p.section ?? 'it') === this.state.activeSection;
+      return matchL && matchQ && matchT && matchP && matchS;
+    }).map(p => ({
+      ...p,
+      projectLine: p.project ? '~/' + p.project : '',
+      tagList: p.tags.map(name => ({
+        name,
+        toggle: () => this.setState(s => ({ page: 0, activeTags: s.activeTags.includes(name) ? s.activeTags.filter(t => t !== name) : [...s.activeTags, name] })),
+      })),
+    }));
+    const perPage = this.props.perPage ?? 12;
+    const pageCount = Math.max(1, Math.ceil(all.length / perPage));
+    const page = Math.min(this.state.page, pageCount - 1);
+    const posts = all.slice(page * perPage, (page + 1) * perPage);
+    const pages = Array.from({ length: pageCount }, (_, i) => ({
+      label: i + 1,
+      current: i === page,
+      border: i === page ? 'var(--accent)' : 'var(--border)',
+      color: i === page ? 'var(--accent-strong)' : 'var(--muted)',
+      bg: i === page ? 'var(--sel)' : 'var(--panel)',
+      go: () => this.setState({ page: i }),
+    }));
+    const tags = this.TAGS.map(name => {
+      const on = active.includes(name);
+      return {
+        name,
+        bg: on ? 'var(--sel)' : 'var(--panel)',
+        border: on ? 'var(--accent)' : 'var(--border)',
+        color: on ? 'var(--accent-strong)' : 'var(--muted)',
+        toggle: () => this.setState(s => ({ page: 0, activeTags: on ? s.activeTags.filter(t => t !== name) : [...s.activeTags, name] })),
+      };
+    });
+    const projects = this.PROJECTS.map(name => {
+      const on = this.state.activeProject === name;
+      return {
+        name,
+        bg: on ? 'var(--sel)' : 'var(--panel)',
+        border: on ? 'var(--field)' : 'var(--border)',
+        color: on ? 'var(--field)' : 'var(--muted)',
+        toggle: () => this.setState({ activeProject: on ? null : name, page: 0 }),
+      };
+    });
+    const byLang = this.POSTS.filter(p => p.lang.toLowerCase().split('/').includes(lang));
+    const f = byLang[0] ?? this.POSTS[0];
+    const featured = { ...f, tagLine: f.tags.map(t => '#' + t).join(' ') };
+    const sections = this.SECTIONS.map(sec => {
+      const on = this.state.activeSection === sec.id;
+      return {
+        name: sec[lang] ?? sec.pl,
+        bg: on ? 'var(--sel)' : 'var(--panel)',
+        border: on ? 'var(--kw)' : 'var(--border)',
+        color: on ? 'var(--kw)' : 'var(--muted)',
+        toggle: () => this.setState({ activeSection: on ? null : sec.id, page: 0 }),
+      };
+    });
+    this._searchRef = this._searchRef || React.createRef();
+    return {
+      featured,
+      projects, sections,
+      searchRef: this._searchRef,
+      goToFilters: () => {
+        const el = this._searchRef.current;
+        if (el) {
+          window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 80, behavior: 'smooth' });
+          el.focus({ preventScroll: true });
+        }
+      },
+      themeLabel: theme === 'dark' ? 'Darcula' : 'Light',
+      toggleTheme: () => this.setState({ theme: theme === 'dark' ? 'light' : 'dark' }),
+      query: this.state.query,
+      setQuery: (e) => this.setState({ query: e.target.value, page: 0 }),
+      posts, tags, pages,
+      showPager: pageCount > 1,
+      prevPage: () => this.setState({ page: Math.max(0, page - 1) }),
+      nextPage: () => this.setState({ page: Math.min(pageCount - 1, page + 1) }),
+      resultCount: all.length,
+      empty: all.length === 0,
+      setPl: () => this.setState({ lang: 'pl', page: 0 }),
+      setEn: () => this.setState({ lang: 'en', page: 0 }),
+      plBg: lang === 'pl' ? 'var(--sel)' : 'var(--panel2)',
+      plColor: lang === 'pl' ? 'var(--accent-strong)' : 'var(--muted)',
+      enBg: lang === 'en' ? 'var(--sel)' : 'var(--panel2)',
+      enColor: lang === 'en' ? 'var(--accent-strong)' : 'var(--muted)',
+    };
+  }
+}
+</script>
+</body>
+</html>

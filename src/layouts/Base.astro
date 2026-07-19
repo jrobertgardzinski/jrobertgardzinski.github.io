@@ -1,0 +1,85 @@
+---
+import { SITE } from '../config';
+import '@fontsource/jetbrains-mono/400.css';
+import '@fontsource/jetbrains-mono/400-italic.css';
+import '@fontsource/jetbrains-mono/500.css';
+import '@fontsource/jetbrains-mono/700.css';
+import '@fontsource/ibm-plex-sans/400.css';
+import '@fontsource/ibm-plex-sans/400-italic.css';
+import '@fontsource/ibm-plex-sans/500.css';
+import '@fontsource/ibm-plex-sans/600.css';
+import '@fontsource/ibm-plex-sans/700.css';
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  lang?: string;
+  active?: 'wpisy' | 'o-mnie' | '';
+  /** URLs of the language variants of the current post, e.g. { pl: '/wpisy/pl/hello-world/' } */
+  counterpart?: Partial<Record<'pl' | 'en', string>>;
+  /** external canonical address for syndicated content; defaults to the page's own URL */
+  canonicalUrl?: string;
+}
+const { title, description = SITE.description, lang = 'pl', active = '', counterpart, canonicalUrl } = Astro.props;
+const canonical = canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).href;
+---
+<!doctype html>
+<html lang={lang} data-theme="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" type="application/rss+xml" title={SITE.title} href="/rss.xml" />
+    {counterpart?.pl && <link rel="alternate" hreflang="pl" href={new URL(counterpart.pl, Astro.site)} />}
+    {counterpart?.en && <link rel="alternate" hreflang="en" href={new URL(counterpart.en, Astro.site)} />}
+    {/* bump ?v= after every icon change — browsers cache favicons very aggressively;
+        site.js swaps both icon links to the -light variants together with the theme */}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=7" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png?v=7" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=7" />
+    <script is:inline>
+      document.documentElement.dataset.theme = localStorage.getItem('theme') || 'dark';
+    </script>
+  </head>
+  <body data-counterpart-pl={counterpart?.pl} data-counterpart-en={counterpart?.en}>
+    <div class="shell">
+      <nav class="top-nav" aria-label="nawigacja główna">
+        <div class="brand-block">
+          <a class="brand" href="/">
+            <span class="logo-badge"><span><span class="logo-j">j</span><span class="logo-r">R<span class="logo-cut">obert</span></span><span class="logo-g">G<span class="logo-cut">ardzinski</span></span></span></span>
+          </a>
+          {/* settings, not navigation — always at hand, also on mobile */}
+          <div class="site-controls">
+            <button id="theme-toggle" title="Przełącz motyw" type="button">Darcula</button>
+            <div class="lang-switch">
+              <button id="lang-pl" class="lang-btn" type="button">PL</button>
+              <button id="lang-en" class="lang-btn" type="button">EN</button>
+            </div>
+          </div>
+        </div>
+        <button id="nav-toggle" class="nav-toggle" type="button" aria-label="menu" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="nav-right">
+          <a class:list={['nav-link', { active: active === 'wpisy' }]} href="/" data-label-pl="wpisy" data-label-en="posts">wpisy</a>
+          <a class:list={['nav-link', { active: active === 'o-mnie' }]} href="/o-mnie/" data-label-pl="o-mnie" data-label-en="about-me">o-mnie</a>
+        </div>
+      </nav>
+      <slot />
+    </div>
+    <script>
+      import '../scripts/site.js';
+    </script>
+    {SITE.goatcounterCode && (
+      <script
+        is:inline
+        data-goatcounter={`https://${SITE.goatcounterCode}.goatcounter.com/count`}
+        async
+        src="https://gc.zgo.at/count.js"
+      ></script>
+    )}
+  </body>
+</html>

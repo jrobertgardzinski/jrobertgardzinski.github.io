@@ -1,0 +1,39 @@
+# Sveltia CMS (kompatybilny z Decap) — edycja wpisów przez przeglądarkę pod /admin
+# Publikacja z CMS = commit do main = automatyczny deploy przez GitHub Actions.
+backend:
+  name: github
+  repo: jrobertgardzinski/blog # TODO: podmień na właściwe repo (owner/nazwa)
+  branch: main
+
+media_folder: public/images
+public_folder: /images
+
+collections:
+  - name: posts
+    label: Wpisy
+    label_singular: Wpis
+    folder: src/content/posts
+    create: true
+    extension: md
+    format: yaml-frontmatter
+    # plik = {slug}.{pl|en}.md — wpis dwujęzyczny to dwa pliki o wspólnym slugu
+    slug: "{{slug}}.{{fields.lang}}"
+    fields:
+      - { name: title, label: Tytuł, widget: string }
+      - { name: date, label: Data, widget: datetime, format: "YYYY-MM-DD", time_format: false }
+      - { name: lang, label: Język, widget: select, options: [pl, en], default: pl }
+      - name: section
+        label: Dział
+        widget: select
+        default: it
+        options:
+          - { label: IT, value: it }
+          - { label: F1, value: f1 }
+          - { label: majsterkowanie, value: diy }
+          - { label: gotowanie, value: cooking }
+      - { name: project, label: Projekt, widget: string, required: false, hint: "np. blog, hexagon-demo, benchmarki" }
+      - { name: tags, label: Tagi, widget: list, default: [] }
+      - { name: excerpt, label: Zajawka, widget: text, required: false }
+      - { name: readingTime, label: "Czas czytania (min)", widget: number, required: false, value_type: int }
+      - { name: draft, label: Szkic, widget: boolean, default: false }
+      - { name: body, label: Treść, widget: markdown }

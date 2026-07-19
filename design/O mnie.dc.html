@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,500;0,700;1,400&amp;family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;display=swap" rel="stylesheet">
+<style>
+html, body { margin: 0; padding: 0; }
+body {
+  --bg: #2B2B2B; --panel: #3C3F41; --panel2: #313335; --border: #4E5254;
+  --text: #BBBBBB; --text-strong: #E8E8E8; --muted: #808080;
+  --accent: #6897BB; --accent-strong: #89B0D0;
+  --kw: #CC7832; --str: #6A8759; --cmt: #808080; --num: #6897BB; --fn: #FFC66D; --ann: #BBB529; --field: #9876AA;
+  --sel: rgba(104,151,187,.18);
+  background: var(--bg); color: var(--text);
+}
+body[data-theme="light"] {
+  --bg: #F7F8FA; --panel: #FFFFFF; --panel2: #EDEFF2; --border: #D4D7DC;
+  --text: #33383D; --text-strong: #080808; --muted: #8C8C8C;
+  --accent: #1B3E7A; --accent-strong: #0033B3;
+  --kw: #0033B3; --str: #067D17; --cmt: #8C8C8C; --num: #1750EB; --fn: #00627A; --ann: #9E880D; --field: #871094;
+  --sel: rgba(0,51,179,.08);
+}
+a { color: var(--accent-strong); text-decoration: none; }
+a:hover { color: var(--fn); text-decoration: underline; }
+::selection { background: var(--sel); }
+</style>
+</helmet>
+<div style="min-height:100vh;font-family:'IBM Plex Sans',sans-serif;font-size:15px;line-height:1.55;display:flex;flex-direction:column;align-items:center">
+  <nav style="width:100%;box-sizing:border-box;background:var(--panel);border-bottom:1px solid var(--border);display:flex;flex-wrap:wrap;align-items:center;gap:10px 20px;padding:10px 16px;font-family:'JetBrains Mono',monospace;font-size:13px">
+    <a href="#" style="display:flex;align-items:center;gap:10px;color:var(--text-strong);font-weight:700;font-size:14px" style-hover="text-decoration:none">
+      <span style="width:26px;height:26px;background:var(--panel2);border:1px solid var(--border);display:grid;place-items:center;border-radius:4px;font-size:12px;font-weight:700"><span><span style="color:var(--text-strong)">j</span><span style="color:#E05555">R</span><span style="color:#4CAF50">G</span></span></span>
+      jRobertGardzinski
+    </a>
+    <div style="display:flex;flex-wrap:wrap;gap:10px 16px;margin-left:auto;align-items:center">
+      <a href="Strona główna.dc.html" style="color:var(--text)">wpisy</a>
+      <a href="Strona główna.dc.html" style="color:var(--text)">tagi</a>
+      <a href="#" style="color:var(--text-strong);border-bottom:2px solid var(--kw);padding-bottom:2px" style-hover="text-decoration:none">o-mnie</a>
+      <button onClick="{{ toggleTheme }}" title="Przełącz motyw" style="cursor:pointer;background:var(--panel2);border:1px solid var(--border);color:var(--text-strong);border-radius:4px;padding:4px 10px;min-width:72px;font-family:'JetBrains Mono',monospace;font-size:12px" style-hover="border-color:var(--accent)">{{ themeLabel }}</button>
+    </div>
+  </nav>
+
+  <main style="width:100%;max-width:880px;box-sizing:border-box;padding:32px 24px 64px;display:flex;flex-direction:column;gap:28px">
+
+    <header style="display:flex;gap:24px;align-items:flex-start;flex-wrap:wrap">
+      <div style="width:96px;height:96px;border-radius:6px;flex-shrink:0;background:repeating-linear-gradient(45deg,var(--panel2),var(--panel2) 6px,var(--panel) 6px,var(--panel) 12px);border:1px solid var(--border);display:grid;place-items:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--muted);text-align:center">zdjęcie<br>autora</div>
+      <div style="flex:1;min-width:280px">
+        <p style="margin:0;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cmt)">// „j" jak w dobrych bibliotekach: jUnit, jOOQ, jRG</p>
+        <h1 style="margin:4px 0 6px;font-size:clamp(24px,6vw,30px);line-height:1.15;color:var(--text-strong);letter-spacing:-.01em">Cześć, jestem Robert.</h1>
+        <p style="margin:0;color:var(--text)">Backend w Javie — od zawsze Spring, od niedawna rozglądam się za alternatywami. Architektura heksagonalna, DDD i przekonanie, że dobry kod czyta się jak dobrą prozę. Piszę po polsku i po angielsku — zależnie od tematu i humoru.</p>
+      </div>
+    </header>
+
+    <section>
+      <h2 style="margin:0 0 12px;font-size:13px;font-family:'JetBrains Mono',monospace;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">// czym się zajmuję</h2>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px">
+        <div style="background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:14px 16px">
+          <p style="margin:0;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--kw);font-weight:700">programowanie</p>
+          <p style="margin:6px 0 0;font-size:13.5px;color:var(--text)">Moja wizytówka. Backend w Javie, porty i adaptery, agregaty które naprawdę coś agregują.</p>
+        </div>
+        <div style="background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:14px 16px">
+          <p style="margin:0;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--kw);font-weight:700">f1</p>
+          <p style="margin:6px 0 0;font-size:13.5px;color:var(--text)">Na pauzie. Wrócę, jak regulacje przestaną psuć wyścigi. Kiedyś to było.</p>
+        </div>
+        <div style="background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:14px 16px">
+          <p style="margin:0;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--kw);font-weight:700">diy</p>
+          <p style="margin:6px 0 0;font-size:13.5px;color:var(--text)">Refaktoring, ale w mieszkaniu. Wiertarka to taki debugger do ścian.</p>
+        </div>
+        <div style="background:var(--panel);border:1px solid var(--border);border-radius:6px;padding:14px 16px">
+          <p style="margin:0;font-family:'JetBrains Mono',monospace;font-size:13px;color:var(--kw);font-weight:700">gotowanie</p>
+          <p style="margin:6px 0 0;font-size:13.5px;color:var(--text)">Od czasu do czasu coś mi się uda. Trzymam się przepisu jak specyfikacji.</p>
+        </div>
+      </div>
+    </section>
+
+    <sc-if value="{{ showFeatured }}" hint-placeholder-val="{{ true }}">
+    <section style="background:var(--panel);border:1px solid var(--border);border-left:3px solid var(--kw);border-radius:6px;padding:16px 20px">
+      <p style="margin:0;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em">najnowszy wpis · PL</p>
+      <h3 style="margin:6px 0 4px;font-size:18px;color:var(--text-strong)"><a href="Wpis.dc.html" style="color:var(--text-strong)" style-hover="color:var(--accent-strong);text-decoration:none">Hello World</a></h3>
+      <p style="margin:0 0 10px;font-size:13.5px;color:var(--text)">Pierwszy wpis. O tym, co tu będzie: Java, hexagon, DDD — i o tym, że tę stronę napisał mi Claude.</p>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;font-family:'JetBrains Mono',monospace;font-size:11.5px">
+        <span style="background:var(--panel2);border:1px solid var(--border);border-radius:3px;padding:2px 8px;color:var(--accent-strong)">#hello-world</span>
+        <span style="background:var(--panel2);border:1px solid var(--border);border-radius:3px;padding:2px 8px;color:var(--accent-strong)">#claude</span>
+      </div>
+    </section>
+    </sc-if>
+
+    <footer style="border-top:1px solid var(--border);padding-top:16px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--muted)">
+      <a href="mailto:jrobertgardzinski@gmail.com">jrobertgardzinski@gmail.com</a>
+      <span><a href="#">github</a> · <a href="#">linkedin</a> · <a href="#">rss</a></span>
+    </footer>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;defaultTheme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;'dark'|'light'&quot;},&quot;showFeatured&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { theme: null };
+  componentDidMount() {
+    const t = this.state.theme ?? this.props.defaultTheme ?? 'dark';
+    document.body.dataset.theme = t;
+    if (this.state.theme === null) this.setState({ theme: t });
+  }
+  componentDidUpdate() {
+    if (this.state.theme) document.body.dataset.theme = this.state.theme;
+  }
+  renderVals() {
+    const theme = this.state.theme ?? this.props.defaultTheme ?? 'dark';
+    return {
+      themeLabel: theme === 'dark' ? 'Darcula' : 'Light',
+      toggleTheme: () => this.setState({ theme: theme === 'dark' ? 'light' : 'dark' }),
+      showFeatured: this.props.showFeatured ?? true,
+    };
+  }
+}
+</script>
+</body>
+</html>

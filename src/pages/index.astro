@@ -1,0 +1,118 @@
+---
+import Base from '../layouts/Base.astro';
+import Footer from '../components/Footer.astro';
+import FeaturedCard from '../components/FeaturedCard.astro';
+import { SITE, SECTIONS } from '../config';
+import { allPosts, groupBySlug, urlOf, excerptOf, readingTimeOf, fmtDate, searchTextOf } from '../lib/posts';
+import { postCountLabel } from '../lib/i18n.js';
+
+const posts = await allPosts();
+const groups = groupBySlug(posts);
+const allTags = [...new Set(posts.flatMap((p) => p.data.tags))];
+const allProjects = [...new Set(posts.map((p) => p.data.project).filter(Boolean))] as string[];
+
+// projects and tags belong to sections — the chip rows narrow down to the selected section
+const sectionsOf = (matches: (p: (typeof posts)[number]) => boolean) =>
+  [...new Set(posts.filter(matches).map((p) => p.data.section))].join(',');
+const featuredPl = posts.find((p) => p.data.lang === 'pl');
+const featuredEn = posts.find((p) => p.data.lang === 'en');
+---
+<Base title={`${SITE.title} — ${SITE.tagline}`} active="wpisy">
+  <main class="page home">
+    {featuredPl && <FeaturedCard post={featuredPl} />}
+    {featuredEn && <FeaturedCard post={featuredEn} hidden />}
+
+    <section class="filters" id="filtry">
+      <div class="search-box">
+        <span class="prompt">&gt;</span>
+        <input
+          id="search-input"
+          placeholder="szukaj wpisów…"
+          data-placeholder-pl="szukaj wpisów…"
+          data-placeholder-en="search posts…"
+          autocomplete="off"
+        />
+      </div>
+      <div class="filter-row" data-filter="sections">
+        <span class="filter-label" data-i18n-pl="działy:" data-i18n-en="sections:">działy:</span>
+        {SECTIONS.map((s) => (
+          <button type="button" class="chip" data-value={s.id} data-label-pl={s.pl} data-label-en={s.en}>{s.pl}</button>
+        ))}
+      </div>
+      <div class="filter-row" data-filter="projects">
+        <span class="filter-label" data-i18n-pl="projekty:" data-i18n-en="projects:">projekty:</span>
+        {allProjects.map((p) => (
+          <button type="button" class="chip" data-value={p} data-sections={sectionsOf((post) => post.data.project === p)}>~/{p}</button>
+        ))}
+        <span class="chip-none" hidden={allProjects.length > 0}>–</span>
+      </div>
+      <div class="filter-row" data-filter="tags">
+        <span class="filter-label" data-i18n-pl="tagi:" data-i18n-en="tags:">tagi:</span>
+        {allTags.map((t) => (
+          <button type="button" class="chip" data-value={t} data-sections={sectionsOf((post) => post.data.tags.includes(t))}>#{t}</button>
+        ))}
+        <span class="chip-none" hidden={allTags.length > 0}>–</span>
+      </div>
+      <div class="filters-footer">
+        <span id="result-count">{postCountLabel(groups.length, 'pl')}</span>
+        <button
+          type="button"
+          id="clear-filters"
+          class="clear-filters"
+          data-i18n-pl="× wyczyść filtry"
+          data-i18n-en="× clear filters"
+          hidden
+        >× wyczyść filtry</button>
+      </div>
+    </section>
+
+    <section class="post-list-wrap">
+      <div id="post-list" data-per-page={SITE.postsPerPage}>
+        {groups.map((g) => (
+          <article
+            class="post-row"
+            data-langs={g.langs.join(',')}
+            data-section={g.section}
+            data-project={g.project}
+            data-tags={g.tags.join(',')}
+            data-search-pl={g.variants.pl && searchTextOf(g.variants.pl)}
+            data-search-en={g.variants.en && searchTextOf(g.variants.en)}
+            hidden={!g.langs.includes('pl')}
+          >
+            {g.langs.map((l) => {
+              const p = g.variants[l]!;
+              return (
+                <div class="variant" data-lang={l} hidden={l !== 'pl' && g.langs.includes('pl')}>
+                  <div class="row-head">
+                    <h3 class="row-title"><a href={urlOf(p)}>{p.data.title}</a></h3>
+                    <span class="lang-badge">{g.langs.length > 1 ? 'PL/EN' : l.toUpperCase()}</span>
+                    {p.data.draft && <span class="lang-badge draft-badge">szkic</span>}
+                  </div>
+                  <p class="row-excerpt">{excerptOf(p)}</p>
+                  <div class="row-meta">
+                    <span>{fmtDate(p.data.date)}</span><span>·</span><span>{readingTimeOf(p)} min</span><span>·</span>
+                    {p.data.tags.map((t) => <button type="button" class="meta-tag" data-value={t}>#{t}</button>)}
+                    {g.project && <span class="meta-project">~/{g.project}</span>}
+                  </div>
+                </div>
+              );
+            })}
+          </article>
+        ))}
+      </div>
+      <p
+        id="empty-state"
+        class="empty-state"
+        data-i18n-pl="// brak wyników — NoSuchPostException"
+        data-i18n-en="// no results — NoSuchPostException"
+        hidden
+      >// brak wyników — NoSuchPostException</p>
+      <div id="pager" class="pager" hidden></div>
+    </section>
+
+    <Footer />
+  </main>
+  <script>
+    import '../scripts/home.js';
+  </script>
+</Base>
