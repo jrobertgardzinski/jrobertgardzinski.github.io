@@ -1,7 +1,8 @@
 Feature: Mobile navigation
-  On phones the menu collapses into a hamburger button. A regular phone
-  (360px, Blackberry-class) still shows the full wordmark; only truly
-  narrow screens (QVGA-class, ≤240px) shrink the logo to the jRG monogram.
+  On phones the menu collapses into a hamburger button, and the long
+  "jRobertGardzinski" wordmark gives way to the compact jRG monogram image
+  (theme-aware, same artwork as the favicon). The full wordmark returns on
+  the desktop layout.
 
   Scenario: The menu collapses into a hamburger on a phone
     Given I open the home page on a phone
@@ -42,10 +43,23 @@ Feature: Mobile navigation
     Then the theme toggle is visible
     And the theme toggle is on the right half of the screen
 
-  Scenario: The full wordmark shows on a regular phone
-    Given I open the home page on a phone
-    Then the logo shows "jRobertGardzinski"
+  Scenario: The wordmark logo shows on desktop
+    Given I open the home page
+    Then the wordmark logo is shown
+    And the wordmark logo is the "dark" variant
 
-  Scenario: The logo shrinks to jRG on a narrow phone
-    Given I open the home page on a narrow phone
-    Then the logo shows "jRG"
+  Scenario: The brand link keeps its accessible name
+    Given I open the home page
+    Then the brand link is labelled "jRobertGardzinski"
+
+  Scenario: The wordmark becomes the monogram image on a phone
+    Given I open the home page on a phone
+    Then the logo is shown as the monogram image
+    And the wordmark logo is hidden
+
+  Scenario: The monogram image follows the theme
+    Given I open the home page on a phone
+    Then the monogram image is the "dark" variant
+    When I tap the hamburger
+    And I toggle the theme
+    Then the monogram image is the "light" variant

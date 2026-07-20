@@ -190,6 +190,35 @@ Then('the logo shows {string}', async function (text) {
   await expect(this.page.locator('.logo-badge')).toHaveText(text, { useInnerText: true });
 });
 
+Then('the logo is shown as the monogram image', async function () {
+  await expect(this.page.locator('.logo-mark')).toBeVisible();
+  // exactly one theme variant of the mark is rendered
+  await expect(this.page.locator('.logo-mark img:visible')).toHaveCount(1);
+});
+
+Then('the wordmark logo is shown', async function () {
+  await expect(this.page.locator('.logo-wordmark')).toBeVisible();
+  await expect(this.page.locator('.logo-wordmark img:visible')).toHaveCount(1);
+});
+
+Then('the wordmark logo is hidden', async function () {
+  await expect(this.page.locator('.logo-wordmark')).toBeHidden();
+});
+
+Then('the wordmark logo is the {string} variant', async function (variant) {
+  const file = variant === 'light' ? 'logo-long-light\\.svg' : 'logo-long\\.svg';
+  await expect(this.page.locator('.logo-wordmark img:visible')).toHaveAttribute('src', new RegExp(file));
+});
+
+Then('the brand link is labelled {string}', async function (label) {
+  await expect(this.page.locator('.brand')).toHaveAttribute('aria-label', label);
+});
+
+Then('the monogram image is the {string} variant', async function (variant) {
+  const file = variant === 'light' ? 'logo-mark-light\\.svg' : 'logo-mark\\.svg';
+  await expect(this.page.locator('.logo-mark img:visible')).toHaveAttribute('src', new RegExp(file));
+});
+
 // ===== theme and language =====
 
 When('I toggle the theme', async function () {

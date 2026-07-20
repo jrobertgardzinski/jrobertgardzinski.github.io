@@ -62,15 +62,19 @@ button { font-family: var(--mono); }
   font-family: var(--mono);
 }
 .brand:hover { color: var(--text-strong); text-decoration: none; }
-.logo-badge {
-  /* bare wordmark — no tile behind the letters, per owner's decision */
-  display: grid; place-items: center; font-size: 15px; font-weight: 700;
-  /* JetBrains Mono (self-hosted, OFL) — merch-safe, per owner's pick */
-  font-family: var(--mono);
-}
-.logo-j { color: var(--logo-j); font-size: .85em; }
-.logo-r { color: var(--logo-r); }
-.logo-g { color: var(--logo-g); }
+/* The logo is pixel-art artwork (transparent — no tile, per owner's decision):
+   the long wordmark on desktop, the compact jRG monogram at the mobile breakpoint.
+   Both ship both theme variants; only the one matching data-theme is shown, so the
+   logo works before JS and flips instantly with the theme toggle. */
+.logo-wordmark, .logo-mark { display: none; }
+.logo-wordmark img, .logo-mark img { display: block; height: 32px; width: auto; }
+:root[data-theme='dark'] .logo-wordmark img.light,
+:root[data-theme='dark'] .logo-mark img.light { display: none; }
+:root[data-theme='light'] .logo-wordmark img.dark,
+:root[data-theme='light'] .logo-mark img.dark { display: none; }
+/* declared after the base rule above so it wins on desktop; the mobile
+   breakpoint below does the same for the monogram */
+@media (min-width: 641px) { .logo-wordmark { display: inline-flex; } }
 .nav-right { display: flex; flex-wrap: wrap; gap: 10px 16px; margin-left: auto; align-items: center; }
 .nav-toggle {
   display: none; cursor: pointer; margin-left: auto;
@@ -93,6 +97,8 @@ button { font-family: var(--mono); }
   .top-nav { position: relative; align-items: flex-start; }
   .nav-toggle { display: flex; position: absolute; top: 10px; right: 16px; }
   .nav-right { display: none; }
+  /* the long wordmark gives way to the compact monogram */
+  .logo-mark { display: inline-flex; }
   /* on phones the settings unfold under the logo only when the menu is open */
   .site-controls { display: none; }
   .top-nav.open .site-controls { display: flex; }
@@ -101,11 +107,6 @@ button { font-family: var(--mono); }
     display: flex; margin-left: auto; padding-top: 44px;
     flex-direction: column; align-items: flex-end; gap: 14px;
   }
-}
-/* truly narrow screens (QVGA-class, ≤240px) — the wordmark collapses to jRG;
-   a regular 360px phone still gets the full name */
-@media (max-width: 240px) {
-  .logo-cut { display: none; }
 }
 .nav-link { color: var(--text); }
 .nav-link:hover { color: var(--fn); text-decoration: none; }

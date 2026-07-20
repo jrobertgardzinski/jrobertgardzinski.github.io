@@ -37,9 +37,9 @@ const canonical = canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).href;
     {counterpart?.en && <link rel="alternate" hreflang="en" href={new URL(counterpart.en, Astro.site)} />}
     {/* bump ?v= after every icon change — browsers cache favicons very aggressively;
         site.js swaps both icon links to the -light variants together with the theme */}
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=7" />
-    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png?v=7" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=7" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=8" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon.png?v=8" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=8" />
     <script is:inline>
       document.documentElement.dataset.theme = localStorage.getItem('theme') || 'dark';
     </script>
@@ -48,8 +48,18 @@ const canonical = canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).href;
     <div class="shell">
       <nav class="top-nav" aria-label="nawigacja główna">
         <div class="brand-block">
-          <a class="brand" href="/">
-            <span class="logo-badge"><span><span class="logo-j">j</span><span class="logo-r">R<span class="logo-cut">obert</span></span><span class="logo-g">G<span class="logo-cut">ardzinski</span></span></span></span>
+          <a class="brand" href="/" aria-label="jRobertGardzinski">
+            {/* pixel-art wordmark (transparent — no tile); the narrow layout swaps it for the
+                compact jRG monogram. Both carry both theme variants; CSS shows the one matching
+                data-theme, so the link works before JS and reacts instantly to the toggle. */}
+            <span class="logo-wordmark">
+              <img class="dark" src="/logo-long.svg?v=8" alt="" width="90" height="14" />
+              <img class="light" src="/logo-long-light.svg?v=8" alt="" width="90" height="14" />
+            </span>
+            <span class="logo-mark">
+              <img class="dark" src="/logo-mark.svg?v=8" alt="" width="14" height="14" />
+              <img class="light" src="/logo-mark-light.svg?v=8" alt="" width="14" height="14" />
+            </span>
           </a>
           {/* settings, not navigation — always at hand, also on mobile */}
           <div class="site-controls">

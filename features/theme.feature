@@ -21,8 +21,8 @@
 
   Scenario: The favicon follows the theme
     Given I open the home page
-    Then the favicon is "/favicon.svg?v=7"
-    And the PNG favicon is "/favicon.png?v=7"
+    Then the favicon is "/favicon.svg?v=8"
+    And the PNG favicon is "/favicon.png?v=8"
     When I toggle the theme
-    Then the favicon is "/favicon-light.svg?v=7"
-    And the PNG favicon is "/favicon-light.png?v=7"
+    Then the favicon is "/favicon-light.svg?v=8"
+    And the PNG favicon is "/favicon-light.png?v=8"

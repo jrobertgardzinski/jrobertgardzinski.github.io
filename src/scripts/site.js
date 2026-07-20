@@ -20,7 +20,7 @@ function updateFavicon() {
   const suffix = html.dataset.theme === 'light' ? '-light' : '';
   for (const link of iconLinks) {
     const ext = link.type === 'image/png' ? 'png' : 'svg';
-    link.href = `/favicon${suffix}.${ext}?v=7`;
+    link.href = `/favicon${suffix}.${ext}?v=8`;
     document.head.appendChild(link);
   }
 }
