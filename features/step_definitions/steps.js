@@ -80,6 +80,52 @@ Then('the photo top lines up with the title', async function () {
   assert.ok(Math.abs(avatar.y - title.y) <= 3, `avatar y=${avatar.y}, title y=${title.y}`);
 });
 
+// only the block for the current language is on screen — and so is its lightbox
+const lightbox = (world) => world.page.locator('.lang-block:not([hidden]) [data-lightbox]');
+
+Then('the photo is loaded', async function () {
+  const loaded = await this.page
+    .locator('.lang-block:not([hidden]) .avatar')
+    .evaluate((img) => img.complete && img.naturalWidth > 0);
+  assert.ok(loaded, 'the photo element is there, but the file never decoded');
+});
+
+When('I click the photo', async function () {
+  await this.page.locator('.lang-block:not([hidden]) [data-lightbox-open]').click();
+});
+
+When('I click the close button', async function () {
+  await lightbox(this).locator('[data-lightbox-close]').click();
+});
+
+When('I press Escape', async function () {
+  await this.page.keyboard.press('Escape');
+});
+
+When('I click the backdrop', async function () {
+  // top-left corner of the viewport — safely outside the centred dialog box
+  await this.page.mouse.click(5, 5);
+});
+
+Then('the enlarged photo is visible', async function () {
+  await expect(lightbox(this).locator('.lightbox-img')).toBeVisible();
+});
+
+Then('the enlarged photo is hidden', async function () {
+  await expect(lightbox(this).locator('.lightbox-img')).toBeHidden();
+});
+
+Then('no enlarged photo is open', async function () {
+  await expect(this.page.locator('dialog.lightbox[open]')).toHaveCount(0);
+});
+
+Then('the language switch cannot be clicked', async function () {
+  await assert.rejects(
+    () => this.page.locator('#lang-en').click({ timeout: 1500 }),
+    'the language switch was reachable while the modal was open — the page behind it is not inert'
+  );
+});
+
 Given('I open the home page on a phone', async function () {
   // a regular small smartphone, Blackberry-class — still gets the full wordmark
   await this.page.setViewportSize({ width: 360, height: 640 });

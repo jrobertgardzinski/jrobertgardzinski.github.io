@@ -1,19 +1,31 @@
 ---
+import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Footer from '../components/Footer.astro';
 import FeaturedCard from '../components/FeaturedCard.astro';
 import { SITE } from '../config';
 import { allPosts } from '../lib/posts';
+import photo from '../assets/robert.jpg';
 
 const posts = await allPosts();
 const featuredPl = posts.find((p) => p.data.lang === 'pl');
 const featuredEn = posts.find((p) => p.data.lang === 'en');
+
+// the same photo in both language blocks — 2x the 96px display size, for retina.
+// the square crop itself is CSS's job (.avatar / object-fit).
+// eager, because it sits above the fold — lazy only delays what is visible on arrival
+const AVATAR = { src: photo, width: 192, alt: 'Robert Gardziński', loading: 'eager' };
+// the same file again, full size, for the lightbox — lazy, since it costs
+// nothing until someone actually clicks the thumbnail
+const AVATAR_FULL = { src: photo, width: 1000, alt: 'Robert Gardziński', loading: 'lazy' };
 ---
 <Base title={`About me — ${SITE.title}`} active="o-mnie">
   <main class="page about">
     <div class="lang-block" data-lang="pl">
       <header class="about-header">
-        <div class="avatar">zdjęcie<br />autora</div>
+        <button class="avatar-button" type="button" data-lightbox-open aria-label="Powiększ zdjęcie">
+          <Image class="avatar" {...AVATAR} />
+        </button>
         <div class="about-intro">
           <p class="about-comment">// „j" jak w dobrych bibliotekach: jUnit, jOOQ, jRG</p>
           <h1 class="about-title">Cześć, jestem Robert.</h1>
@@ -46,11 +58,18 @@ const featuredEn = posts.find((p) => p.data.lang === 'en');
           </div>
         </div>
       </section>
+
+      <dialog class="lightbox" data-lightbox aria-label="Zdjęcie autora">
+        <button class="lightbox-close" type="button" data-lightbox-close aria-label="Zamknij">×</button>
+        <Image class="lightbox-img" {...AVATAR_FULL} />
+      </dialog>
     </div>
 
     <div class="lang-block" data-lang="en" hidden>
       <header class="about-header">
-        <div class="avatar">author's<br />photo</div>
+        <button class="avatar-button" type="button" data-lightbox-open aria-label="Enlarge photo">
+          <Image class="avatar" {...AVATAR} />
+        </button>
         <div class="about-intro">
           <p class="about-comment">// "j" as in good libraries: jUnit, jOOQ, jRG</p>
           <h1 class="about-title">Hi, I'm Robert.</h1>
@@ -83,6 +102,11 @@ const featuredEn = posts.find((p) => p.data.lang === 'en');
           </div>
         </div>
       </section>
+
+      <dialog class="lightbox" data-lightbox aria-label="Author's photo">
+        <button class="lightbox-close" type="button" data-lightbox-close aria-label="Close">×</button>
+        <Image class="lightbox-img" {...AVATAR_FULL} />
+      </dialog>
     </div>
 
     {featuredPl && <FeaturedCard post={featuredPl} small showDate={false} />}
@@ -92,6 +116,19 @@ const featuredEn = posts.find((p) => p.data.lang === 'en');
   </main>
   <script>
     import { getLang } from '../scripts/site.js';
+
+    // every language block carries its own lightbox, so the labels stay bilingual
+    // the same way the rest of this page does
+    for (const block of document.querySelectorAll('.lang-block')) {
+      const dialog = block.querySelector('[data-lightbox]');
+      if (!dialog) continue;
+      block.querySelector('[data-lightbox-open]')?.addEventListener('click', () => dialog.showModal());
+      dialog.querySelector('[data-lightbox-close]')?.addEventListener('click', () => dialog.close());
+      // a click that lands on the dialog itself came from the backdrop, not from the
+      // photo; Escape needs no handler, <dialog> closes on it natively
+      dialog.addEventListener('click', (e) => { if (e.target === dialog) dialog.close(); });
+    }
+
     const applyLang = () => {
       const lang = getLang();
       for (const block of document.querySelectorAll('.lang-block')) {
