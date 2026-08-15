@@ -35,6 +35,8 @@ const T = post.data.lang === 'pl'
       noOlder: '← starszych wpisów brak',
       noNewer: 'nowszych wpisów brak →',
       history: 'historia zmian ↗',
+      // Intl.PluralRules categories — "1 wyświetlenie", "3 wyświetlenia", "5 wyświetleń"
+      views: { one: 'wyświetlenie', few: 'wyświetlenia', many: 'wyświetleń', other: 'wyświetleń' },
     }
   : {
       back: '← posts',
@@ -43,6 +45,7 @@ const T = post.data.lang === 'pl'
       noOlder: '← no older posts',
       noNewer: 'no newer posts →',
       history: 'change history ↗',
+      views: { one: 'view', other: 'views' },
     };
 ---
 <Base
@@ -61,11 +64,47 @@ const T = post.data.lang === 'pl'
       <div class="post-meta mono">
         <span>{fmtDate(post.data.date)}</span><span>·</span><span>{readingTimeOf(post)} min</span><span>·</span>
         {updated && <><span class="post-updated">{T.updated} {fmtDate(updated)}</span><span>·</span></>}
+        {/* filled in by the script below; stays hidden when GoatCounter has no number for this page */}
+        {SITE.goatcounterCode && (
+          <><span class="post-views" id="post-views" hidden></span><span class="post-views-sep" id="post-views-sep" hidden>·</span></>
+        )}
         <span class="lang-badge">{badge}</span>
         {post.data.draft && <span class="lang-badge draft-badge">szkic</span>}
         {post.data.tags.map((t) => <span class="tag-chip">#{t}</span>)}
       </div>
     </header>
+
+    {SITE.goatcounterCode && (
+      <script is:inline define:vars={{ code: SITE.goatcounterCode, lang: post.data.lang, forms: T.views }}>
+        // Reader-facing view count, straight from the GoatCounter public counts endpoint
+        // (needs "Allow adding visitor counts to your website" enabled in site settings).
+        // Every failure mode — endpoint off, page not visited yet, request blocked —
+        // simply leaves the counter hidden, so the meta line never shows a broken number.
+        (async () => {
+          const p = location.pathname;
+          // GoatCounter may have the path stored with or without the trailing slash
+          const paths = p.endsWith('/') && p !== '/' ? [p, p.slice(0, -1)] : [p];
+          for (const path of paths) {
+            let count;
+            try {
+              const res = await fetch(`https://${code}.goatcounter.com/counter${path}.json`);
+              if (!res.ok) continue;
+              ({ count } = await res.json());
+            } catch {
+              return; // network/CORS failure — retrying the other path would fail too
+            }
+            const n = Number(String(count).replace(/\D/g, ''));
+            if (!n) continue;
+            const form = forms[new Intl.PluralRules(lang).select(n)] ?? forms.other;
+            const views = document.getElementById('post-views');
+            views.textContent = `${n.toLocaleString(lang)} ${form}`;
+            views.hidden = false;
+            document.getElementById('post-views-sep').hidden = false;
+            return;
+          }
+        })();
+      </script>
+    )}
 
     {!counterpart.pl && (
       <p class="translation-notice mono-comment" id="no-pl-notice" hidden>

@@ -11,3 +11,7 @@ Feature: Analytics (GoatCounter)
   Scenario: Post pages have no analytics script either
     Given I open the post "hello-world" in language "pl"
     Then the page has no GoatCounter script
+
+  Scenario: No view counter on a post until GoatCounter is configured
+    Given I open the post "hello-world" in language "pl"
+    Then the post has no view counter

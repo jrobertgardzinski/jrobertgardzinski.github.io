@@ -451,6 +451,26 @@ Then('the page has a GoatCounter script for {string}', async function (code) {
   );
 });
 
+Then('the post has no view counter', async function () {
+  await expect(this.page.locator('.post-views')).toHaveCount(0);
+});
+
+// stubs the public counts endpoint — the hook aborts external requests, and a route
+// registered later wins, so this must run BEFORE the post page is opened
+Given('GoatCounter reports {string} views', async function (count) {
+  await this.context.route(/goatcounter\.com\/counter\//, (route) =>
+    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ count }) })
+  );
+});
+
+Given('GoatCounter has no data for this page', async function () {
+  await this.context.route(/goatcounter\.com\/counter\//, (route) => route.fulfill({ status: 404, body: '' }));
+});
+
+Then('the post view counter shows {string}', async function (text) {
+  await expect(this.page.locator('.post-views')).toHaveText(text);
+});
+
 // ===== HTTP requests (RSS, 404s, …) =====
 
 When('I fetch {string}', async function (path) {

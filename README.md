@@ -160,9 +160,19 @@ Uruchomienie (raz, ~5 minut):
 1. Załóż konto na [goatcounter.com](https://www.goatcounter.com) i wybierz kod strony,
    np. `jrg` — dashboard będzie pod `https://jrg.goatcounter.com`.
 2. Wpisz kod w `src/config.ts`: `goatcounterCode: 'jrg'`.
-3. Podmień scenariusze w `features/analytics.feature` na pozytywne — krok już czeka:
-   `Then the page has a GoatCounter script for "jrg"`.
-4. Commit + push — statystyki lecą od pierwszego wejścia (lokalne wejścia z localhost nie są liczone).
+3. W GoatCounterze: **Settings → Site settings → „Allow adding visitor counts to your website"**
+   — bez tego licznik wyświetleń na wpisach nie ma skąd wziąć liczby (patrz niżej).
+4. Podmień scenariusze w `features/analytics.feature` na pozytywne — kroki już czekają:
+   `Then the page has a GoatCounter script for "jrg"` oraz (z podmienionym endpointem)
+   `Given GoatCounter reports "1,234" views` + `Then the post view counter shows "1 234 wyświetleń"`.
+5. Commit + push — statystyki lecą od pierwszego wejścia (lokalne wejścia z localhost nie są liczone).
+
+**Licznik wyświetleń na wpisie** (`src/pages/wpisy/[lang]/[slug].astro`): belka wpisu dociąga liczbę
+z publicznego endpointu `https://<kod>.goatcounter.com/counter/<ścieżka>.json` i pokazuje ją z odmianą
+przez liczbę mnogą (`1 wyświetlenie` / `3 wyświetlenia` / `12 wyświetleń`, po angielsku `view`/`views`).
+Element renderuje się dopiero po wpisaniu `goatcounterCode`, a każda awaria — wyłączony endpoint,
+zablokowany request, strona bez jeszcze żadnej wizyty — po prostu zostawia licznik ukryty, więc belka
+nigdy nie pokazuje zera ani błędu. Liczby narastają od dnia włączenia analityki, historii nie da się odtworzyć.
 
 **Uwaga na przyszłość:** darmowy GoatCounter jest dla użytku **niekomercyjnego**. Gdy blog zacznie
 zarabiać (płatna współpraca), przejdź na Cloudflare Web Analytics (darmowy, bez tej klauzuli) albo
