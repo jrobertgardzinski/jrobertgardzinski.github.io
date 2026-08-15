@@ -1,17 +1,37 @@
 Feature: Analytics (GoatCounter)
   Traffic is measured with GoatCounter — cookieless, no personal data,
-  so no consent banner is needed. Until the owner configures the
-  goatcounterCode in src/config.ts, the site must not load ANY
-  analytics script.
+  so no consent banner is needed. Posts additionally show their own view
+  count, read from the public counts endpoint; every failure of that
+  endpoint has to leave the meta line clean rather than show a broken number.
 
-  Scenario: No analytics script until GoatCounter is configured
+  Scenario: The site loads the analytics script
     Given I open the home page
-    Then the page has no GoatCounter script
+    Then the page has a GoatCounter script for "jrobertgardzinski"
 
-  Scenario: Post pages have no analytics script either
+  Scenario: Post pages load it as well
     Given I open the post "hello-world" in language "pl"
-    Then the page has no GoatCounter script
+    Then the page has a GoatCounter script for "jrobertgardzinski"
 
-  Scenario: No view counter on a post until GoatCounter is configured
+  Scenario: A Polish post shows its view count
+    Given GoatCounter reports "128" views
+    And I open the post "hello-world" in language "pl"
+    Then the post view counter shows "128 wyświetleń"
+
+  Scenario: The Polish plural follows the number
+    Given GoatCounter reports "1" views
+    And I open the post "hello-world" in language "pl"
+    Then the post view counter shows "1 wyświetlenie"
+
+  Scenario: An English post counts in English
+    Given GoatCounter reports "1,234" views
+    And I open the post "hello-world" in language "en"
+    Then the post view counter shows "1,234 views"
+
+  Scenario: No number for this page yet
+    Given GoatCounter has no data for this page
+    And I open the post "hello-world" in language "pl"
+    Then the post meta does not show "wyświetle"
+
+  Scenario: The counts endpoint is unreachable
     Given I open the post "hello-world" in language "pl"
-    Then the post has no view counter
+    Then the post meta does not show "wyświetle"

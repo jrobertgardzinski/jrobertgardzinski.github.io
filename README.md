@@ -156,16 +156,23 @@ Ruch mierzy **GoatCounter** — darmowy do użytku niekomercyjnego, bez cookies 
 osobowych, więc **bez banera RODO**. Dopóki kod nie jest skonfigurowany, strona nie ładuje
 żadnego skryptu analityki (przybite testami w `features/analytics.feature`).
 
-Uruchomienie (raz, ~5 minut):
-1. Załóż konto na [goatcounter.com](https://www.goatcounter.com) i wybierz kod strony,
-   np. `jrg` — dashboard będzie pod `https://jrg.goatcounter.com`.
-2. Wpisz kod w `src/config.ts`: `goatcounterCode: 'jrg'`.
-3. W GoatCounterze: **Settings → Site settings → „Allow adding visitor counts to your website"**
-   — bez tego licznik wyświetleń na wpisach nie ma skąd wziąć liczby (patrz niżej).
-4. Podmień scenariusze w `features/analytics.feature` na pozytywne — kroki już czekają:
-   `Then the page has a GoatCounter script for "jrg"` oraz (z podmienionym endpointem)
-   `Given GoatCounter reports "1,234" views` + `Then the post view counter shows "1 234 wyświetleń"`.
-5. Commit + push — statystyki lecą od pierwszego wejścia (lokalne wejścia z localhost nie są liczone).
+Konto założone: kod strony **`jrobertgardzinski`**, dashboard pod
+`https://jrobertgardzinski.goatcounter.com`, kod wpisany w `src/config.ts`,
+scenariusze w `features/analytics.feature` przepięte na pozytywne.
+
+Zostało jedno ustawienie po stronie GoatCountera — w panelu, w **Settings**, zaznacz
+**„allow using the visitor counter"**. Bez tego publiczny endpoint z licznikami zwraca
+`403: Need to enable the 'allow using the visitor counter' setting`, więc licznik wyświetleń
+na wpisach nie ma skąd wziąć liczby (sam skrypt analityki działa niezależnie od tej opcji).
+Sprawdzenie z terminala:
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' https://jrobertgardzinski.goatcounter.com/counter/TOTAL.json
+# 403 = ustawienie wyłączone, 200 = działa
+```
+
+Statystyki lecą od pierwszego wejścia po deployu; lokalne wejścia z `localhost` nie są liczone,
+więc na `npm run dev` licznik nie pojawi się nigdy.
 
 **Licznik wyświetleń na wpisie** (`src/pages/wpisy/[lang]/[slug].astro`): belka wpisu dociąga liczbę
 z publicznego endpointu `https://<kod>.goatcounter.com/counter/<ścieżka>.json` i pokazuje ją z odmianą
@@ -198,5 +205,6 @@ przenosi się między narzędziami, a stare liczby warto móc pokazać.
 - [ ] zdjęcie na stronę „o mnie" — wrzuć plik do `public/images/` i daj znać (placeholder w paski czeka)
 - [ ] zakup domeny `jrobertgardzinski.pl` + rekordy DNS jak wyżej (plik `public/CNAME` już jest)
 - [ ] rejestracja bloga na disqus.com → otrzymany shortname wpisz w `src/config.ts` (do tego czasu sekcja komentarzy pokazuje placeholder)
-- [ ] konto na goatcounter.com → kod wpisz w `src/config.ts` (kroki w sekcji „Analityka")
+- [x] konto na goatcounter.com → kod `jrobertgardzinski` w `src/config.ts`
+- [ ] w panelu GoatCountera włącz „allow using the visitor counter" (bez tego licznik na wpisach milczy)
 - [ ] Google Search Console + zgłoszenie sitemapy (po podpięciu domeny)

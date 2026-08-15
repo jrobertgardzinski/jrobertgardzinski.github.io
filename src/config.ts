@@ -15,7 +15,7 @@ export const SITE = {
   // shortname strony z disqus.com/admin — puste = komentarze pokazują placeholder
   disqusShortname: '',
   // kod z goatcounter.com (np. 'jrg' dla jrg.goatcounter.com) — puste = brak skryptu analityki
-  goatcounterCode: '',
+  goatcounterCode: 'jrobertgardzinski',
   postsPerPage: 12,
 } as const;
 
