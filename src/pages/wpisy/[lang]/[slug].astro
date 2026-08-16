@@ -112,7 +112,7 @@ const T = langOf(post) === 'pl'
               // never returns, not even on reload.
               const res = await fetch(url, { cache: 'no-store' });
               if (!res.ok) {
-                log(`${res.status} dla ${path} — GoatCounter nie ma jeszcze liczby dla tej ścieżki (odświeża je raz na godzinę i cache'uje też pudła)`);
+                log(`${res.status} dla ${path} — GoatCounter nie ma liczby dla tej ścieżki. Ich cache zapamiętuje odpowiedź (także 404) przy PIERWSZYM pytaniu o daną ścieżkę i trzyma ją ok. 4 godzin; nagłówek age w odpowiedzi mówi, ile ta pustka ma już lat. Nie da się tego obejść z przeglądarki — ani parametrem w URL-u, ani no-cache.`);
                 continue;
               }
               // count = pageviews, count_unique = visits; we take the latter, because ten

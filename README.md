@@ -190,13 +190,16 @@ nigdy nie pokazuje zera ani błędu. Liczby narastają od dnia włączenia anali
 **Gdy licznik nic nie pokazuje** — to prawie zawsze jedna z dwóch rzeczy, a konsola przeglądarki mówi
 która (każde wyjście z tego skryptu loguje `[views] …`):
 
-1. **Liczby są cache'owane w dwóch miejscach naraz — i dotyczy to także `404`.** Endpoint odpowiada
-   `cache-control: public` z `expires` kilka godzin do przodu, więc: (a) po stronie GoatCountera liczba
-   dla świeżo odwiedzonej strony pojawia się z opóźnieniem (panel pisze wprost: *„The public view is
-   updated once an hour"*), (b) po stronie **przeglądarki** raz pobrane `404` ląduje w cache'u dyskowym
-   i jest odgrywane przy każdym kolejnym wejściu — nawet po `F5`. W HAR-ze widać to jako
-   `"_fromCache": "disk"` przy zerowym ruchu sieciowym. Dlatego strona pyta z `cache: 'no-store'`;
-   punkt (a) zostaje i trzeba go po prostu przeczekać.
+1. **Liczby są cache'owane w dwóch miejscach naraz — i dotyczy to także `404`.**
+   **(a) Po stronie GoatCountera:** ich cache zapamiętuje odpowiedź przy PIERWSZYM pytaniu o daną
+   ścieżkę i trzyma ją ok. 4 godzin. Jeśli ktoś (albo Twój własny `curl`) zapytał o adres, zanim
+   GoatCounter zaksięgował pierwszą wizytę, to `404` jest zabetonowane na te kilka godzin — mimo że
+   w panelu wizyta widnieje od razu. Zmierzone: `?_=cokolwiek` nie zmienia klucza cache'u, nagłówek
+   `Cache-Control: no-cache` jest ignorowany, `age` rośnie dalej. Z przeglądarki NIE DA SIĘ tego obejść
+   — trzeba przeczekać. Ścieżka nigdy wcześniej nieodpytana odpowiada z `age: 0`.
+   **(b) Po stronie przeglądarki:** raz pobrane `404` ląduje w cache'u dyskowym i jest odgrywane przy
+   każdym kolejnym wejściu, nawet po `F5` (w HAR-ze: `"_fromCache": "disk"` przy zerowym ruchu
+   sieciowym). To akurat naprawia `cache: 'no-store'` w kodzie strony.
    ```bash
    curl -sD - https://jrobertgardzinski.goatcounter.com/counter/wpisy/pl/hello-world.json | head -20
    ```
