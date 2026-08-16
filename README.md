@@ -181,6 +181,25 @@ Element renderuje się dopiero po wpisaniu `goatcounterCode`, a każda awaria �
 zablokowany request, strona bez jeszcze żadnej wizyty — po prostu zostawia licznik ukryty, więc belka
 nigdy nie pokazuje zera ani błędu. Liczby narastają od dnia włączenia analityki, historii nie da się odtworzyć.
 
+**Gdy licznik nic nie pokazuje** — to prawie zawsze jedna z dwóch rzeczy, a konsola przeglądarki mówi
+która (każde wyjście z tego skryptu loguje `[views] …`):
+
+1. **Endpoint odświeża się raz na godzinę i cache'uje też pudła.** Wejście sprzed pięciu minut jeszcze
+   nie istnieje dla `/counter/…json`, a raz zwrócony `404` siedzi w cache do pełnej godziny — mimo że
+   w panelu wizyta jest widoczna od razu. Widać to w nagłówkach: `age` rośnie do `expires`.
+   ```bash
+   curl -sD - https://jrobertgardzinski.goatcounter.com/counter/wpisy/pl/hello-world.json | head -20
+   ```
+   Panel pisze to zresztą wprost: *„The public view is updated once an hour"*. Nie ma tu nic do naprawy
+   po stronie bloga — trzeba poczekać do pełnej godziny.
+2. **Bloker reklam zabija żądanie.** `goatcounter.com` jest na standardowych listach filtrów (uBlock,
+   Firefox ETP w trybie „ścisłym", Brave), więc **Ty** możesz nie widzieć licznika, choć czytelnicy widzą
+   go normalnie. Sprawdzenie zajmuje sekundę: konsola pokaże `[views] żądanie … nie wyszło z przeglądarki`,
+   a wejście w trybie prywatnym z wyłączonym blokerem pokaże liczbę.
+
+Ścieżki GoatCounter zapisuje **bez końcowego ukośnika** (`/wpisy/pl/hello-world`), a strona pyta o oba
+warianty, więc to akurat nie jest źródłem problemów.
+
 **Uwaga na przyszłość:** darmowy GoatCounter jest dla użytku **niekomercyjnego**. Gdy blog zacznie
 zarabiać (płatna współpraca), przejdź na Cloudflare Web Analytics (darmowy, bez tej klauzuli) albo
 Plausible (~9 €/mies., koszt na fakturę JDG, publiczny dashboard dla partnerów) — albo wesprzyj

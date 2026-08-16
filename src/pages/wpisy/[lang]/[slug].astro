@@ -80,21 +80,41 @@ const T = langOf(post) === 'pl'
         // (needs "Allow adding visitor counts to your website" enabled in site settings).
         // Every failure mode — endpoint off, page not visited yet, request blocked —
         // simply leaves the counter hidden, so the meta line never shows a broken number.
+        //
+        // Silence is the correct reader-facing behaviour but a terrible way to debug,
+        // so every path out of here says WHY in the console. Two failure modes look
+        // identical from the outside and mean opposite things:
+        //   404 — GoatCounter rebuilds these counts once an hour and caches the misses
+        //         too, so a page visited minutes ago legitimately has no number yet
+        //         (check the response's `age` header against `expires`);
+        //   TypeError/network — the request never left the browser: goatcounter.com
+        //         sits on the standard tracker blocklists, so an ad blocker or strict
+        //         tracking protection kills it. Everyone else still sees the counter.
         (async () => {
           const p = location.pathname;
           // GoatCounter may have the path stored with or without the trailing slash
           const paths = p.endsWith('/') && p !== '/' ? [p, p.slice(0, -1)] : [p];
+          const log = (msg) => console.info(`[views] ${msg}`);
           for (const path of paths) {
+            const url = `https://${code}.goatcounter.com/counter${path}.json`;
             let count;
             try {
-              const res = await fetch(`https://${code}.goatcounter.com/counter${path}.json`);
-              if (!res.ok) continue;
+              const res = await fetch(url);
+              if (!res.ok) {
+                log(`${res.status} dla ${path} — GoatCounter nie ma jeszcze liczby dla tej ścieżki (odświeża je raz na godzinę i cache'uje też pudła)`);
+                continue;
+              }
               ({ count } = await res.json());
-            } catch {
-              return; // network/CORS failure — retrying the other path would fail too
+            } catch (err) {
+              // network/CORS failure — retrying the other path would fail too
+              log(`żądanie do ${url} nie wyszło z przeglądarki (${err}) — najczęściej blokuje je bloker reklam albo ochrona przed śledzeniem`);
+              return;
             }
             const n = Number(String(count).replace(/\D/g, ''));
-            if (!n) continue;
+            if (!n) {
+              log(`ścieżka ${path} ma zero wyświetleń — licznik zostaje ukryty`);
+              continue;
+            }
             const form = forms[new Intl.PluralRules(lang).select(n)] ?? forms.other;
             const views = document.getElementById('post-views');
             views.textContent = `${n.toLocaleString(lang)} ${form}`;
