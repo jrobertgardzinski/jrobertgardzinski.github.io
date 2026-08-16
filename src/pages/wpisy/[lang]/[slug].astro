@@ -92,8 +92,9 @@ const T = langOf(post) === 'pl'
         // Silence is the correct reader-facing behaviour but a terrible way to debug,
         // so every path out of here says WHY in the console. Two failure modes look
         // identical from the outside and mean opposite things:
-        //   404 — GoatCounter rebuilds these counts periodically, so a page visited
-        //         minutes ago legitimately has no number yet;
+        //   404 — GoatCounter has no number for this exact path yet. Its counts are
+        //         cached for up to four hours, so a page visited minutes ago
+        //         legitimately reads as empty; that lag is expected, not a fault;
         //   TypeError/network — the request never left the browser: goatcounter.com
         //         sits on the standard tracker blocklists, so an ad blocker or strict
         //         tracking protection kills it. Everyone else still sees the counter.
@@ -103,7 +104,9 @@ const T = langOf(post) === 'pl'
           const paths = p.endsWith('/') && p !== '/' ? [p, p.slice(0, -1)] : [p];
           const log = (msg) => console.info(`[views] ${msg}`);
           for (const path of paths) {
-            const url = `https://${code}.goatcounter.com/counter${path}.json`;
+            // the endpoint is /counter/ + the path *including* its leading slash,
+            // so a real URL carries a double slash: /counter//wpisy/pl/slug/.json
+            const url = `https://${code}.goatcounter.com/counter/${path}.json`;
             let count;
             try {
               // no-store, because GoatCounter answers with `cache-control: public` and an
@@ -115,9 +118,9 @@ const T = langOf(post) === 'pl'
                 log(`${res.status} dla ${path} — GoatCounter nie ma liczby dla tej ścieżki. Ich cache zapamiętuje odpowiedź (także 404) przy PIERWSZYM pytaniu o daną ścieżkę i trzyma ją ok. 4 godzin; nagłówek age w odpowiedzi mówi, ile ta pustka ma już lat. Nie da się tego obejść z przeglądarki — ani parametrem w URL-u, ani no-cache.`);
                 continue;
               }
-              // count = pageviews, count_unique = visits; we take the latter, because ten
-              // reloads by one person are not ten readers
-              ({ count_unique: count } = await res.json());
+              // count_unique is documented as identical to count and kept only for
+              // backwards compatibility — "should not be used for new code"
+              ({ count } = await res.json());
             } catch (err) {
               // network/CORS failure — retrying the other path would fail too
               log(`żądanie do ${url} nie wyszło z przeglądarki (${err}) — najczęściej blokuje je bloker reklam albo ochrona przed śledzeniem`);

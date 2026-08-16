@@ -456,21 +456,26 @@ Then('the post has no view counter', async function () {
 });
 
 // stubs the public counts endpoint — the hook aborts external requests, and a route
-// registered later wins, so this must run BEFORE the post page is opened
+// registered later wins, so this must run BEFORE the post page is opened.
+// The pattern deliberately spells out the real URL shape, double slash included
+// (/counter/ + the path *with* its leading slash): a page asking for the wrong URL
+// falls through to the aborting hook and leaves the counter hidden, failing the scenario.
+const COUNTS_ENDPOINT = /goatcounter\.com\/counter\/\/[^?]*\.json$/;
+
 Given('GoatCounter reports {string} visits', async function (count) {
-  await this.context.route(/goatcounter\.com\/counter\//, (route) =>
-    // the endpoint answers with both numbers; the page must pick count_unique, so the
-    // pageview count is deliberately a different, larger number here
+  await this.context.route(COUNTS_ENDPOINT, (route) =>
+    // the endpoint answers with both numbers; count_unique is a backwards-compatibility
+    // alias the page must NOT read, so it carries a different, larger number here
     route.fulfill({
       status: 200,
       contentType: 'application/json',
-      body: JSON.stringify({ count_unique: count, count: '999999' }),
+      body: JSON.stringify({ count, count_unique: '999999' }),
     })
   );
 });
 
 Given('GoatCounter has no data for this page', async function () {
-  await this.context.route(/goatcounter\.com\/counter\//, (route) => route.fulfill({ status: 404, body: '' }));
+  await this.context.route(COUNTS_ENDPOINT, (route) => route.fulfill({ status: 404, body: '' }));
 });
 
 Then('the post view counter shows {string}', async function (text) {
