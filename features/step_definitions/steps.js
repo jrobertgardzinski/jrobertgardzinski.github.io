@@ -423,7 +423,7 @@ Then('the history link points to {string}', async function (url) {
 });
 
 Then('the post language badge is {string}', async function (badge) {
-  await expect(this.page.locator('.post-meta .lang-badge')).toHaveText(badge);
+  await expect(this.page.locator('.post-labels .lang-badge')).toHaveText(badge);
 });
 
 Then('I see the code block header {string}', async function (filename) {
@@ -457,9 +457,15 @@ Then('the post has no view counter', async function () {
 
 // stubs the public counts endpoint — the hook aborts external requests, and a route
 // registered later wins, so this must run BEFORE the post page is opened
-Given('GoatCounter reports {string} views', async function (count) {
+Given('GoatCounter reports {string} visits', async function (count) {
   await this.context.route(/goatcounter\.com\/counter\//, (route) =>
-    route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ count }) })
+    // the endpoint answers with both numbers; the page must pick count_unique, so the
+    // pageview count is deliberately a different, larger number here
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ count_unique: count, count: '999999' }),
+    })
   );
 });
 

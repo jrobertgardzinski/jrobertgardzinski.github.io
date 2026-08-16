@@ -174,9 +174,15 @@ curl -s -o /dev/null -w '%{http_code}\n' https://jrobertgardzinski.goatcounter.c
 Statystyki lecą od pierwszego wejścia po deployu; lokalne wejścia z `localhost` nie są liczone,
 więc na `npm run dev` licznik nie pojawi się nigdy.
 
-**Licznik wyświetleń na wpisie** (`src/pages/wpisy/[lang]/[slug].astro`): belka wpisu dociąga liczbę
+**Licznik wizyt na wpisie** (`src/pages/wpisy/[lang]/[slug].astro`): belka wpisu dociąga liczbę
 z publicznego endpointu `https://<kod>.goatcounter.com/counter/<ścieżka>.json` i pokazuje ją z odmianą
-przez liczbę mnogą (`1 wyświetlenie` / `3 wyświetlenia` / `12 wyświetleń`, po angielsku `view`/`views`).
+przez liczbę mnogą (`1 wizyta` / `3 wizyty` / `12 wizyt`, po angielsku `visit`/`visits`).
+Endpoint zwraca dwie liczby i bierzemy **`count_unique`, czyli wizyty** — nie `count`, czyli odsłony:
+dziesięć wejść tej samej osoby to jeden czytelnik, a nie dziesięciu. Ta sama liczba, którą panel
+GoatCountera pokazuje jako „visits".
+Żądanie idzie z `cache: 'no-store'` — patrz punkt 1 niżej, bez tego licznik potrafi zamarznąć na kilka
+godzin. Tego akurat **nie pokrywa suita BDD**: Playwright przechwytuje żądania przed cache'em
+przeglądarki, więc stub przechodzi tak samo z poprawką i bez niej.
 Element renderuje się dopiero po wpisaniu `goatcounterCode`, a każda awaria — wyłączony endpoint,
 zablokowany request, strona bez jeszcze żadnej wizyty — po prostu zostawia licznik ukryty, więc belka
 nigdy nie pokazuje zera ani błędu. Liczby narastają od dnia włączenia analityki, historii nie da się odtworzyć.
@@ -184,14 +190,18 @@ nigdy nie pokazuje zera ani błędu. Liczby narastają od dnia włączenia anali
 **Gdy licznik nic nie pokazuje** — to prawie zawsze jedna z dwóch rzeczy, a konsola przeglądarki mówi
 która (każde wyjście z tego skryptu loguje `[views] …`):
 
-1. **Endpoint odświeża się raz na godzinę i cache'uje też pudła.** Wejście sprzed pięciu minut jeszcze
-   nie istnieje dla `/counter/…json`, a raz zwrócony `404` siedzi w cache do pełnej godziny — mimo że
-   w panelu wizyta jest widoczna od razu. Widać to w nagłówkach: `age` rośnie do `expires`.
+1. **Liczby są cache'owane w dwóch miejscach naraz — i dotyczy to także `404`.** Endpoint odpowiada
+   `cache-control: public` z `expires` kilka godzin do przodu, więc: (a) po stronie GoatCountera liczba
+   dla świeżo odwiedzonej strony pojawia się z opóźnieniem (panel pisze wprost: *„The public view is
+   updated once an hour"*), (b) po stronie **przeglądarki** raz pobrane `404` ląduje w cache'u dyskowym
+   i jest odgrywane przy każdym kolejnym wejściu — nawet po `F5`. W HAR-ze widać to jako
+   `"_fromCache": "disk"` przy zerowym ruchu sieciowym. Dlatego strona pyta z `cache: 'no-store'`;
+   punkt (a) zostaje i trzeba go po prostu przeczekać.
    ```bash
    curl -sD - https://jrobertgardzinski.goatcounter.com/counter/wpisy/pl/hello-world.json | head -20
    ```
-   Panel pisze to zresztą wprost: *„The public view is updated once an hour"*. Nie ma tu nic do naprawy
-   po stronie bloga — trzeba poczekać do pełnej godziny.
+   Jeśli diagnozujesz to w DevToolsach, **zaznacz „Disable cache"** albo patrz w kolumnę Size — inaczej
+   zobaczysz odpowiedź sprzed godzin i uznasz, że blog nie czyta danych.
 2. **Bloker reklam zabija żądanie.** `goatcounter.com` jest na standardowych listach filtrów (uBlock,
    Firefox ETP w trybie „ścisłym", Brave), więc **Ty** możesz nie widzieć licznika, choć czytelnicy widzą
    go normalnie. Sprawdzenie zajmuje sekundę: konsola pokaże `[views] żądanie … nie wyszło z przeglądarki`,
