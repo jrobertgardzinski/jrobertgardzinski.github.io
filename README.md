@@ -34,6 +34,7 @@ Cały stack stoi na Node.js zamiast JVM — analogie do świata Javy w nawiasach
 ## Pisanie wpisów
 
 Jeden wpis = jeden plik Markdown w `src/content/posts/` o nazwie `{slug}.{pl|en}.md`.
+**Język bierze się z nazwy pliku** (`.pl.md` / `.en.md`) — nie ma go we frontmatterze.
 Wpis dwujęzyczny to **dwa pliki o wspólnym slugu** (`hello-world.pl.md` + `hello-world.en.md`) —
 na liście pojawia się raz z badge `PL/EN`, a przełącznik PL|EN na stronie wpisu podmienia wersję.
 
@@ -41,7 +42,6 @@ na liście pojawia się raz z badge `PL/EN`, a przełącznik PL|EN na stronie wp
 ---
 title: "Hello World"
 date: 2026-07-17
-lang: pl          # pl | en
 section: it       # it | f1 | diy | cooking
 project: blog     # opcjonalnie
 tags: [hello-world, claude]

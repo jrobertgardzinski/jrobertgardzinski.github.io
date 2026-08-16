@@ -8,13 +8,13 @@ const posts = defineCollection({
     pattern: '**/*.md',
     // the BDD suite builds from fixture content (tests/build-fixtures.mjs)
     base: process.env.POSTS_DIR ?? './src/content/posts',
-    // keep the ".pl"/".en" suffix intact in the id (default slugger would eat the dot)
+    // keep the ".pl"/".en" suffix intact in the id — it IS the language (see langOf in lib/posts)
+    // (default slugger would eat the dot)
     generateId: ({ entry }) => entry.replace(/\.md$/, ''),
   }),
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
-    lang: z.enum(['pl', 'en']),
     section: z.enum(['it', 'f1', 'diy', 'cooking']).default('it'),
     project: z.string().optional(),
     tags: z.array(z.string()).default([]),

@@ -1,6 +1,6 @@
 ---
 import type { Post } from '../lib/posts';
-import { urlOf, excerptOf, readingTimeOf, fmtDate } from '../lib/posts';
+import { urlOf, excerptOf, readingTimeOf, fmtDate, langOf } from '../lib/posts';
 
 interface Props {
   post: Post;
@@ -11,8 +11,8 @@ interface Props {
 }
 const { post, hidden = false, small = false, showDate = true } = Astro.props;
 ---
-<section class:list={['featured-card', { small }]} data-lang={post.data.lang} hidden={hidden}>
-  <p class="featured-label">{post.data.lang === 'pl' ? 'najnowszy wpis' : 'latest post'} · {post.data.lang.toUpperCase()}</p>
+<section class:list={['featured-card', { small }]} data-lang={langOf(post)} hidden={hidden}>
+  <p class="featured-label">{langOf(post) === 'pl' ? 'najnowszy wpis' : 'latest post'} · {langOf(post).toUpperCase()}</p>
   {small ? (
     <h3 class="featured-title"><a href={urlOf(post)}>{post.data.title}</a></h3>
   ) : (

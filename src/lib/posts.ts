@@ -6,7 +6,15 @@ export type Post = CollectionEntry<'posts'>;
 export type Lang = 'pl' | 'en';
 
 export const slugOf = (p: Post) => p.id.replace(/\.(pl|en)$/, '');
-export const urlOf = (p: Post) => `/wpisy/${p.data.lang}/${slugOf(p)}/`;
+
+/** Language comes from the file name — `{slug}.pl.md` / `{slug}.en.md`, never from the frontmatter. */
+export function langOf(p: Post): Lang {
+  const m = /\.(pl|en)$/.exec(p.id);
+  if (!m) throw new Error(`Post "${p.id}" has no language suffix — name the file {slug}.pl.md or {slug}.en.md`);
+  return m[1] as Lang;
+}
+
+export const urlOf = (p: Post) => `/wpisy/${langOf(p)}/${slugOf(p)}/`;
 export const fmtDate = (d: Date) => d.toISOString().slice(0, 10);
 
 export function readingTimeOf(p: Post): number {
@@ -85,7 +93,7 @@ export function groupBySlug(posts: Post[]): PostGroup[] {
       g = { slug, langs: [], variants: {}, date: p.data.date, section: p.data.section, project: p.data.project ?? '', tags: [] };
       map.set(slug, g);
     }
-    g.variants[p.data.lang] = p;
+    g.variants[langOf(p)] = p;
     if (p.data.date > g.date) g.date = p.data.date;
     if (p.data.project) g.project = p.data.project;
     for (const t of p.data.tags) if (!g.tags.includes(t)) g.tags.push(t);

@@ -4,12 +4,12 @@ import Base from '../layouts/Base.astro';
 import Footer from '../components/Footer.astro';
 import FeaturedCard from '../components/FeaturedCard.astro';
 import { SITE } from '../config';
-import { allPosts } from '../lib/posts';
+import { allPosts, langOf } from '../lib/posts';
 import photo from '../assets/robert.jpg';
 
 const posts = await allPosts();
-const featuredPl = posts.find((p) => p.data.lang === 'pl');
-const featuredEn = posts.find((p) => p.data.lang === 'en');
+const featuredPl = posts.find((p) => langOf(p) === 'pl');
+const featuredEn = posts.find((p) => langOf(p) === 'en');
 
 // the same photo in both language blocks — 2x the 96px display size, for retina.
 // the square crop itself is CSS's job (.avatar / object-fit).

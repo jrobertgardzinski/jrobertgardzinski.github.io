@@ -3,31 +3,31 @@ import { render } from 'astro:content';
 import Base from '../../../layouts/Base.astro';
 import Footer from '../../../components/Footer.astro';
 import { SITE } from '../../../config';
-import { allPosts, slugOf, urlOf, excerptOf, readingTimeOf, updatedOf, fmtDate, type Post } from '../../../lib/posts';
+import { allPosts, slugOf, urlOf, excerptOf, readingTimeOf, updatedOf, fmtDate, langOf, type Post } from '../../../lib/posts';
 
 export async function getStaticPaths() {
   const posts = await allPosts();
-  return posts.map((post) => ({ params: { lang: post.data.lang, slug: slugOf(post) }, props: { post } }));
+  return posts.map((post) => ({ params: { lang: langOf(post), slug: slugOf(post) }, props: { post } }));
 }
 
 const { post } = Astro.props as { post: Post };
 const posts = await allPosts();
 const slug = slugOf(post);
-const counterpartPost = posts.find((p) => slugOf(p) === slug && p.data.lang !== post.data.lang);
-const sameLang = posts.filter((p) => p.data.lang === post.data.lang);
+const counterpartPost = posts.find((p) => slugOf(p) === slug && langOf(p) !== langOf(post));
+const sameLang = posts.filter((p) => langOf(p) === langOf(post));
 const idx = sameLang.findIndex((p) => p.id === post.id);
 const newer = idx > 0 ? sameLang[idx - 1] : null;
 const older = idx >= 0 && idx < sameLang.length - 1 ? sameLang[idx + 1] : null;
-const badge = counterpartPost ? 'PL/EN' : post.data.lang.toUpperCase();
+const badge = counterpartPost ? 'PL/EN' : langOf(post).toUpperCase();
 const updated = updatedOf(post);
 const historyUrl = SITE.repoUrl ? `${SITE.repoUrl}/commits/main/src/content/posts/${post.id}.md` : null;
 const counterpart = {
-  [post.data.lang]: urlOf(post),
-  ...(counterpartPost ? { [counterpartPost.data.lang]: urlOf(counterpartPost) } : {}),
+  [langOf(post)]: urlOf(post),
+  ...(counterpartPost ? { [langOf(counterpartPost)]: urlOf(counterpartPost) } : {}),
 };
 const { Content } = await render(post);
 // post chrome speaks the post's language
-const T = post.data.lang === 'pl'
+const T = langOf(post) === 'pl'
   ? {
       back: '← wpisy',
       updated: 'zaktualizowano',
@@ -51,7 +51,7 @@ const T = post.data.lang === 'pl'
 <Base
   title={`${post.data.title} — ${SITE.title}`}
   description={excerptOf(post)}
-  lang={post.data.lang}
+  lang={langOf(post)}
   active="wpisy"
   counterpart={counterpart}
   canonicalUrl={post.data.canonicalUrl}
@@ -75,7 +75,7 @@ const T = post.data.lang === 'pl'
     </header>
 
     {SITE.goatcounterCode && (
-      <script is:inline define:vars={{ code: SITE.goatcounterCode, lang: post.data.lang, forms: T.views }}>
+      <script is:inline define:vars={{ code: SITE.goatcounterCode, lang: langOf(post), forms: T.views }}>
         // Reader-facing view count, straight from the GoatCounter public counts endpoint
         // (needs "Allow adding visitor counts to your website" enabled in site settings).
         // Every failure mode — endpoint off, page not visited yet, request blocked —

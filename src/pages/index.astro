@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 import Footer from '../components/Footer.astro';
 import FeaturedCard from '../components/FeaturedCard.astro';
 import { SITE, SECTIONS } from '../config';
-import { allPosts, groupBySlug, urlOf, excerptOf, readingTimeOf, fmtDate, searchTextOf } from '../lib/posts';
+import { allPosts, groupBySlug, urlOf, excerptOf, readingTimeOf, fmtDate, searchTextOf, langOf } from '../lib/posts';
 import { postCountLabel } from '../lib/i18n.js';
 
 const posts = await allPosts();
@@ -14,8 +14,8 @@ const allProjects = [...new Set(posts.map((p) => p.data.project).filter(Boolean)
 // projects and tags belong to sections — the chip rows narrow down to the selected section
 const sectionsOf = (matches: (p: (typeof posts)[number]) => boolean) =>
   [...new Set(posts.filter(matches).map((p) => p.data.section))].join(',');
-const featuredPl = posts.find((p) => p.data.lang === 'pl');
-const featuredEn = posts.find((p) => p.data.lang === 'en');
+const featuredPl = posts.find((p) => langOf(p) === 'pl');
+const featuredEn = posts.find((p) => langOf(p) === 'en');
 ---
 <Base title={`${SITE.title} — ${SITE.tagline}`} active="wpisy">
   <main class="page home">

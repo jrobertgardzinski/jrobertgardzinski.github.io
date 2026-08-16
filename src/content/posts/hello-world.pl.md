@@ -1,7 +1,6 @@
 ---
 title: "Hello World"
 date: 2026-07-17
-lang: pl
 section: it
 tags: [hello-world, claude]
 readingTime: 3

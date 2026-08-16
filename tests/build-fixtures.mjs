@@ -42,7 +42,6 @@ await write(
   `
 title: "Fixture PL 01"
 date: 2026-03-01
-lang: pl
 section: f1
 project: hexagon-demo
 tags: [spring, ddd]
@@ -56,7 +55,6 @@ await write(
   `
 title: "Fixture PL 02"
 date: 2026-03-02
-lang: pl
 section: it
 project: benchmarki
 tags: [ddd]
@@ -70,7 +68,6 @@ await write(
   `
 title: "Fixture Syndicated"
 date: 2026-03-05
-lang: pl
 section: it
 tags: [fixture]
 canonicalUrl: "https://example.com/original-article/"
@@ -84,7 +81,6 @@ await write(
   `
 title: "Fixture Draft"
 date: 2026-03-10
-lang: pl
 section: it
 tags: [fixture]
 excerpt: "Wpis roboczy — nie powinien być nigdzie opublikowany."
@@ -101,7 +97,6 @@ for (let i = 1; i <= 13; i++) {
     `
 title: "Fixture EN ${n}"
 date: 2026-02-${n}
-lang: en
 section: it
 tags: [fixture]
 excerpt: "English fixture post number ${n}."

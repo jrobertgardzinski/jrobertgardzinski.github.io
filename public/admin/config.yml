@@ -21,6 +21,8 @@ collections:
     fields:
       - { name: title, label: Tytuł, widget: string }
       - { name: date, label: Data, widget: datetime, format: "YYYY-MM-DD", time_format: false }
+      # to pole steruje TYLKO nazwą pliku (slug wyżej) — strona czyta język z ".pl"/".en"
+      # w nazwie, a nie z frontmattera; CMS i tak dopisze je do pliku, build to ignoruje
       - { name: lang, label: Język, widget: select, options: [pl, en], default: pl }
       - name: section
         label: Dział
