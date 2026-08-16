@@ -229,6 +229,9 @@ button { font-family: var(--mono); }
 .post-header { display: flex; flex-direction: column; gap: 10px; }
 .post-title { margin: 0; font-size: clamp(26px, 7vw, 34px); line-height: 1.15; color: var(--text-strong); letter-spacing: -.01em; }
 .post-meta { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 11.5px; color: var(--muted); }
+/* second meta row: language badge, draft badge and tags. Sits tighter under the
+   facts line than the header's own 10px rhythm — the two rows read as one block. */
+.post-labels { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; font-size: 11.5px; color: var(--muted); margin-top: -4px; }
 .tag-chip { background: var(--panel2); border: 1px solid var(--border); border-radius: 3px; padding: 2px 8px; color: var(--accent-strong); }
 
 .post-body { display: flex; flex-direction: column; gap: 16px; font-size: 15.5px; line-height: 1.7; color: var(--text); text-wrap: pretty; }

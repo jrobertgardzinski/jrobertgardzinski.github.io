@@ -62,13 +62,20 @@ const T = langOf(post) === 'pl'
 
     <header class="post-header">
       <h1 class="post-title">{post.data.title}</h1>
+      {/* two lines on purpose: what the post IS (date, length, traffic) above,
+          how it is LABELLED (language, draft, tags) below — the second line is the
+          one that grows without limit, so it gets its own row instead of pushing
+          the numbers around. Every separator sits BEFORE its item, so an optional
+          item that never arrives cannot leave a dangling "·" at the end. */}
       <div class="post-meta mono">
-        <span>{fmtDate(post.data.date)}</span><span>·</span><span>{readingTimeOf(post)} min</span><span>·</span>
-        {updated && <><span class="post-updated">{T.updated} {fmtDate(updated)}</span><span>·</span></>}
+        <span>{fmtDate(post.data.date)}</span><span>·</span><span>{readingTimeOf(post)} min</span>
+        {updated && <><span>·</span><span class="post-updated">{T.updated} {fmtDate(updated)}</span></>}
         {/* filled in by the script below; stays hidden when GoatCounter has no number for this page */}
         {SITE.goatcounterCode && (
-          <><span class="post-views" id="post-views" hidden></span><span class="post-views-sep" id="post-views-sep" hidden>·</span></>
+          <><span class="post-views-sep" id="post-views-sep" hidden>·</span><span class="post-views" id="post-views" hidden></span></>
         )}
+      </div>
+      <div class="post-labels mono">
         <span class="lang-badge">{badge}</span>
         {post.data.draft && <span class="lang-badge draft-badge">szkic</span>}
         {post.data.tags.map((t) => <span class="tag-chip">#{t}</span>)}
@@ -85,9 +92,8 @@ const T = langOf(post) === 'pl'
         // Silence is the correct reader-facing behaviour but a terrible way to debug,
         // so every path out of here says WHY in the console. Two failure modes look
         // identical from the outside and mean opposite things:
-        //   404 — GoatCounter rebuilds these counts once an hour and caches the misses
-        //         too, so a page visited minutes ago legitimately has no number yet
-        //         (check the response's `age` header against `expires`);
+        //   404 — GoatCounter rebuilds these counts periodically, so a page visited
+        //         minutes ago legitimately has no number yet;
         //   TypeError/network — the request never left the browser: goatcounter.com
         //         sits on the standard tracker blocklists, so an ad blocker or strict
         //         tracking protection kills it. Everyone else still sees the counter.
