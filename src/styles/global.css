@@ -238,6 +238,18 @@ button { font-family: var(--mono); }
 .post-body p { margin: 0; }
 .post-body h2 { margin: 8px 0 0; font-size: 21px; color: var(--text-strong); }
 .post-body strong { color: var(--text-strong); }
+/* listy (kroki przepisu): .post-body rozstawia bloki flex-gapem, ale gap nie sięga
+   do wnętrza <li>, a p ma wyzerowany margines — bez tego punkty zlewają się w blok */
+.post-body ol, .post-body ul { margin: 0; padding-left: 1.6em; display: flex; flex-direction: column; gap: 14px; }
+.post-body li > p + p { margin-top: 10px; }
+.post-body li::marker { color: var(--muted); }
+/* zdjęcia we wpisach: ![opis](../image/plik.jpg) — astro:assets sam je przeskaluje
+   i wpisze width/height, więc tutaj zostaje tylko zmieszczenie ich w kolumnie tekstu.
+   max-height pilnuje zdjęć pionowych — bez niego telefoniczny kadr 3:4 zajmuje dwa ekrany */
+.post-body img {
+  display: block; max-width: 100%; max-height: 70vh; width: auto; height: auto;
+  border: 1px solid var(--border); border-radius: 6px;
+}
 .post-body :not(pre) > code {
   font-family: var(--mono); font-size: .88em; background: var(--panel2);
   border: 1px solid var(--border); border-radius: 3px; padding: 1px 5px;
