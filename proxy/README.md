@@ -31,17 +31,30 @@ of the path in one call.
 
    Expect JSON whose `total` field is the visit count the proxy will serve.
 
-2. **Deno Deploy** (free tier) — new project → link this GitHub repo →
-   entrypoint `proxy/main.ts`. Env vars:
+2. **Deno Deploy** (free tier) — new app → link this GitHub repo. In the
+   current console the entrypoint hides behind the framework preset, so in
+   Settings → App Configuration → Edit set:
+
+   - Framework preset: **No Preset** (the Astro autodetection would build
+     the blog instead of the proxy)
+   - Install command / Build command: **empty** — the proxy has no deps
+   - Runtime Configuration: **Dynamic**, Entrypoint: **`proxy/main.ts`**
+     (App Directory stays at repo root)
+
+   Then Settings → Environment Variables and Secrets — attach to the
+   timeline tracking `main`:
 
    | name | value |
    |---|---|
-   | `GOATCOUNTER_TOKEN` | the token from step 1 (required) |
+   | `GOATCOUNTER_TOKEN` | the token from step 1 (required, type Secret) |
    | `GOATCOUNTER_CODE`  | defaults to `jrobertgardzinski` |
    | `ALLOWED_ORIGIN`    | defaults to `https://jrobertgardzinski.pl` |
 
-3. **Custom domain** — in the Deno Deploy project add
-   `wizyty.jrobertgardzinski.pl`; it shows a CNAME target. In the OVH DNS
+   Smoke-test the app URL from the Overview page before touching DNS:
+   `curl https://<app-url>/wpisy/pl/hello-world/` → `{"count":"3"}`.
+
+3. **Custom domain** — in the Deno Deploy app (Settings → Custom domains)
+   add `wizyty.jrobertgardzinski.pl`; it shows a CNAME target. In the OVH DNS
    zone for `jrobertgardzinski.pl` add that CNAME record. Certificates are
    provisioned automatically.
 
