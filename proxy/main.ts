@@ -48,24 +48,23 @@ function cors(origin: string | null): HeadersInit {
 
 /** All-time visits for a blog path, from the authenticated GoatCounter API. */
 async function fetchCount(path: string): Promise<number> {
-  // GoatCounter may hold the path with or without its trailing slash;
-  // include_paths takes both and the counts are summed below, which is
-  // correct either way (a visit is stored under exactly one spelling)
+  // stats/total aggregates server-side across include_paths, so both
+  // trailing-slash spellings of the path are covered in one number — a visit
+  // is stored under exactly one of them, whichever GoatCounter recorded
   const qs = new URLSearchParams({
     start: SINCE,
     path_by_name: "true", // include_paths by name, not by numeric path ID
-    group: "month", // coarse per-hit stats arrays, keeps the response small
-    limit: "100",
   });
   qs.append("include_paths", path);
   if (path.endsWith("/") && path !== "/") qs.append("include_paths", path.slice(0, -1));
 
-  const res = await fetch(`https://${CODE}.goatcounter.com/api/v0/stats/hits?${qs}`, {
+  const res = await fetch(`https://${CODE}.goatcounter.com/api/v0/stats/total?${qs}`, {
     headers: { Authorization: `Bearer ${TOKEN}` },
   });
   if (!res.ok) throw new Error(`GoatCounter API: ${res.status} ${await res.text()}`);
-  const { hits } = await res.json();
-  return (hits ?? []).reduce((sum: number, h: { count?: number }) => sum + (h.count ?? 0), 0);
+  // "Total number of visitors (including events)" — the blog registers no events
+  const { total } = await res.json();
+  return total ?? 0;
 }
 
 async function handler(req: Request): Promise<Response> {

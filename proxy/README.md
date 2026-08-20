@@ -8,19 +8,28 @@ The proxy reads GoatCounter's authenticated API, which is near-real-time,
 unlike the public counter endpoint (cached ~4 h).
 
 `GET /wpisy/pl/hello-world/` → `{"count": "3"}` (404 when the count is 0 —
-same contract as GoatCounter's public counter endpoint).
+same contract as GoatCounter's public counter endpoint). Internally it reads
+`/api/v0/stats/total`, which aggregates across both trailing-slash spellings
+of the path in one call.
 
 ## One-time setup
 
 1. **GoatCounter API token** — on goatcounter.com: user menu → API →
-   new token with the "read statistics" permission. Sanity-check it:
+   new token with the "read statistics" permission. Sanity-check it with
+   these two single-line commands (multi-line commands with `\` are easy
+   to break when copied — a truncated URL shows GoatCounter's HTML 404):
 
    ```sh
-   curl -H "Authorization: Bearer $TOKEN" \
-     "https://jrobertgardzinski.goatcounter.com/api/v0/stats/hits?start=2024-01-01T00:00:00Z&path_by_name=true&include_paths=/wpisy/pl/hello-world/"
+   curl -H "Authorization: Bearer $TOKEN" "https://jrobertgardzinski.goatcounter.com/api/v0/me"
    ```
 
-   Expect JSON with a `hits` array whose items carry `path` and `count`.
+   Expect a JSON blob with your user — that alone proves the token works.
+
+   ```sh
+   curl -H "Authorization: Bearer $TOKEN" "https://jrobertgardzinski.goatcounter.com/api/v0/stats/total?start=2024-01-01T00:00:00Z&path_by_name=true&include_paths=/wpisy/pl/hello-world/"
+   ```
+
+   Expect JSON whose `total` field is the visit count the proxy will serve.
 
 2. **Deno Deploy** (free tier) — new project → link this GitHub repo →
    entrypoint `proxy/main.ts`. Env vars:
