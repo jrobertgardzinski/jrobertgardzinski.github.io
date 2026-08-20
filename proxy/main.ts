@@ -50,13 +50,18 @@ function cors(origin: string | null): HeadersInit {
 async function fetchCount(path: string): Promise<number> {
   // stats/total aggregates server-side across include_paths, so both
   // trailing-slash spellings of the path are covered in one number — a visit
-  // is stored under exactly one of them, whichever GoatCounter recorded
+  // is stored under exactly one of them, whichever GoatCounter recorded.
+  // goatcounter.Strings is a comma-separated type (types.go), NOT a repeated
+  // query key — repeated keys decode to a value FindPathIDs never matches,
+  // which silently filters to nothing and reports 0. It also compares the
+  // given patterns against lower(path), so send them lowercased.
+  const variants = [path];
+  if (path.endsWith("/") && path !== "/") variants.push(path.slice(0, -1));
   const qs = new URLSearchParams({
     start: SINCE,
     path_by_name: "true", // include_paths by name, not by numeric path ID
+    include_paths: variants.map((v) => v.toLowerCase()).join(","),
   });
-  qs.append("include_paths", path);
-  if (path.endsWith("/") && path !== "/") qs.append("include_paths", path.slice(0, -1));
 
   const res = await fetch(`https://${CODE}.goatcounter.com/api/v0/stats/total?${qs}`, {
     headers: { Authorization: `Bearer ${TOKEN}` },
