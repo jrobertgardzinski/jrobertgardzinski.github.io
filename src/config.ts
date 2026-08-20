@@ -16,6 +16,10 @@ export const SITE = {
   disqusShortname: '',
   // kod z goatcounter.com (np. 'jrg' dla jrg.goatcounter.com) — puste = brak skryptu analityki
   goatcounterCode: 'jrobertgardzinski',
+  // first-party proxy for the visit counter (proxy/README.md) — ad blockers kill
+  // browser requests to goatcounter.com, a same-site subdomain they leave alone.
+  // Empty = the page only queries goatcounter.com directly (blockable, 4h cache).
+  viewsProxy: 'https://wizyty.jrobertgardzinski.pl',
   postsPerPage: 12,
 } as const;
 

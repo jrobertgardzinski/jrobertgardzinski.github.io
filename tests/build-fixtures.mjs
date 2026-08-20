@@ -4,6 +4,7 @@
 // into a temporary, gitignored folder and removed after the build.
 import { build } from 'astro';
 import { execFileSync } from 'node:child_process';
+import { createServer } from 'node:http';
 import { rm, mkdir, writeFile, appendFile, copyFile } from 'node:fs/promises';
 
 const postsDir = 'tests/.generated-posts';
@@ -120,11 +121,31 @@ const clearCaches = async () => {
   await rm('node_modules/.astro', { recursive: true, force: true });
 };
 
+// Visit counts are read from GoatCounter while the site builds (src/lib/views.ts),
+// so the fixture build gets its own stub instead of the real service: the suite
+// stays offline and the baked numbers stay the same on every run. Only one post
+// carries a count — the rest answer 404, which keeps the pages whose scenarios
+// stub the browser-side request free of a pre-rendered number.
+const COUNTS = { '/wpisy/pl/fixture-pl-01/': '22' };
+const counts = createServer((req, res) => {
+  // the real endpoint is /counter/ + the path *with* its leading slash → double slash
+  const count = COUNTS[decodeURIComponent(req.url).replace(/^\/counter\//, '').replace(/\.json$/, '')];
+  if (!count) {
+    res.writeHead(404);
+    return res.end('');
+  }
+  res.writeHead(200, { 'content-type': 'application/json' });
+  res.end(JSON.stringify({ count, count_unique: '999999' }));
+});
+await new Promise((resolve) => counts.listen(0, '127.0.0.1', resolve));
+process.env.GOATCOUNTER_COUNTS_ORIGIN = `http://127.0.0.1:${counts.address().port}`;
+
 process.env.POSTS_DIR = postsDir;
 await clearCaches();
 try {
   await build({ outDir: 'dist-test', logLevel: 'warn' });
 } finally {
+  counts.close();
   await clearCaches();
   await rm(postsDir, { recursive: true, force: true });
 }

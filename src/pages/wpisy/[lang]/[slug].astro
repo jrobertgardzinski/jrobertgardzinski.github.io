@@ -4,6 +4,7 @@ import Base from '../../../layouts/Base.astro';
 import Footer from '../../../components/Footer.astro';
 import { SITE } from '../../../config';
 import { allPosts, slugOf, urlOf, excerptOf, readingTimeOf, updatedOf, fmtDate, langOf, type Post } from '../../../lib/posts';
+import { fetchViewCount, formatViews, VIEW_FORMS } from '../../../lib/views';
 
 export async function getStaticPaths() {
   const posts = await allPosts();
@@ -26,6 +27,9 @@ const counterpart = {
   ...(counterpartPost ? { [langOf(counterpartPost)]: urlOf(counterpartPost) } : {}),
 };
 const { Content } = await render(post);
+// baked in at build time so blockers cannot take the counter away — see src/lib/views.ts
+const views = await fetchViewCount(urlOf(post));
+const viewsLabel = views === null ? '' : formatViews(views, langOf(post));
 // post chrome speaks the post's language
 const T = langOf(post) === 'pl'
   ? {
@@ -35,9 +39,6 @@ const T = langOf(post) === 'pl'
       noOlder: '← starszych wpisów brak',
       noNewer: 'nowszych wpisów brak →',
       history: 'historia zmian ↗',
-      // we show count_unique — visits, the word GoatCounter's own dashboard uses —
-      // rather than pageviews. Intl.PluralRules categories: "1 wizyta", "3 wizyty", "5 wizyt"
-      views: { one: 'wizyta', few: 'wizyty', many: 'wizyt', other: 'wizyt' },
     }
   : {
       back: '← posts',
@@ -46,7 +47,6 @@ const T = langOf(post) === 'pl'
       noOlder: '← no older posts',
       noNewer: 'no newer posts →',
       history: 'change history ↗',
-      views: { one: 'visit', other: 'visits' },
     };
 ---
 <Base
@@ -70,9 +70,10 @@ const T = langOf(post) === 'pl'
       <div class="post-meta mono">
         <span>{fmtDate(post.data.date)}</span><span>·</span><span>{readingTimeOf(post)} min</span>
         {updated && <><span>·</span><span class="post-updated">{T.updated} {fmtDate(updated)}</span></>}
-        {/* filled in by the script below; stays hidden when GoatCounter has no number for this page */}
+        {/* rendered at build time, refreshed by the script below when the reader's
+            browser can reach GoatCounter; hidden while there is no number at all */}
         {SITE.goatcounterCode && (
-          <><span class="post-views-sep" id="post-views-sep" hidden>·</span><span class="post-views" id="post-views" hidden></span></>
+          <><span class="post-views-sep" id="post-views-sep" hidden={!viewsLabel}>·</span><span class="post-views" id="post-views" hidden={!viewsLabel}>{viewsLabel}</span></>
         )}
       </div>
       <div class="post-labels mono">
@@ -83,53 +84,63 @@ const T = langOf(post) === 'pl'
     </header>
 
     {SITE.goatcounterCode && (
-      <script is:inline define:vars={{ code: SITE.goatcounterCode, lang: langOf(post), forms: T.views }}>
-        // Reader-facing view count, straight from the GoatCounter public counts endpoint
-        // (needs "Allow adding visitor counts to your website" enabled in site settings).
-        // Every failure mode — endpoint off, page not visited yet, request blocked —
-        // simply leaves the counter hidden, so the meta line never shows a broken number.
+      <script is:inline define:vars={{ code: SITE.goatcounterCode, proxy: SITE.viewsProxy, baked: views ?? 0, lang: langOf(post), forms: VIEW_FORMS[langOf(post)] }}>
+        // Refresh for the number already rendered above. The build baked in the count
+        // it saw at deploy time (src/lib/views.ts); this walks fresher sources and
+        // NEVER lowers or hides what the build put there — that is the whole point
+        // of baking it in. Sources, in order of preference:
+        //   1. the first-party proxy (proxy/README.md) — near-real-time, and being
+        //      same-site it is invisible to tracker blocklists;
+        //   2. goatcounter.com directly — cached ~4 hours on their side, and blocked
+        //      outright by ad blockers and most mobile tracking protection
+        //      (EasyPrivacy carries `||goatcounter.com^$third-party`), which is
+        //      exactly why the number is baked into the HTML and proxied at all.
         //
-        // Silence is the correct reader-facing behaviour but a terrible way to debug,
-        // so every path out of here says WHY in the console. Two failure modes look
-        // identical from the outside and mean opposite things:
-        //   404 — GoatCounter has no number for this exact path yet. Its counts are
-        //         cached for up to four hours, so a page visited minutes ago
-        //         legitimately reads as empty; that lag is expected, not a fault;
-        //   TypeError/network — the request never left the browser: goatcounter.com
-        //         sits on the standard tracker blocklists, so an ad blocker or strict
-        //         tracking protection kills it. Everyone else still sees the counter.
+        // Doing nothing is the correct reader-facing behaviour but a terrible way to
+        // debug, so every path out of here says WHY in the console:
+        //   404 — the source has no number for this path. GoatCounter's public
+        //         endpoint additionally caches responses (404s included) for ~4 h;
+        //   TypeError/network — the request never left the browser (blocker) or the
+        //         host does not resolve (proxy not deployed yet). Both are expected
+        //         states, not faults.
         (async () => {
-          const p = location.pathname;
-          // GoatCounter may have the path stored with or without the trailing slash
-          const paths = p.endsWith('/') && p !== '/' ? [p, p.slice(0, -1)] : [p];
           const log = (msg) => console.info(`[views] ${msg}`);
-          for (const path of paths) {
-            // the endpoint is /counter/ + the path *including* its leading slash,
-            // so a real URL carries a double slash: /counter//wpisy/pl/slug/.json
-            const url = `https://${code}.goatcounter.com/counter/${path}.json`;
+          const p = location.pathname;
+          const sources = [];
+          if (proxy) sources.push(`${proxy}${p}`);
+          // GoatCounter may have the path stored with or without the trailing slash;
+          // its endpoint is /counter/ + the path *including* its leading slash, so a
+          // real URL carries a double slash: /counter//wpisy/pl/slug/.json
+          const gcPaths = p.endsWith('/') && p !== '/' ? [p, p.slice(0, -1)] : [p];
+          for (const path of gcPaths) sources.push(`https://${code}.goatcounter.com/counter/${path}.json`);
+          for (const url of sources) {
             let count;
             try {
-              // no-store, because GoatCounter answers with `cache-control: public` and an
-              // `expires` hours ahead — and that covers its 404s too. Without it the browser
-              // replays the first miss from disk for the rest of the day, so the counter
-              // never returns, not even on reload.
+              // no-store, because GoatCounter answers with `cache-control: public` and
+              // an `expires` hours ahead — and that covers its 404s too. Without it the
+              // browser replays the first miss from disk for the rest of the day.
               const res = await fetch(url, { cache: 'no-store' });
               if (!res.ok) {
-                log(`${res.status} dla ${path} — GoatCounter nie ma liczby dla tej ścieżki. Ich cache zapamiętuje odpowiedź (także 404) przy PIERWSZYM pytaniu o daną ścieżkę i trzyma ją ok. 4 godzin; nagłówek age w odpowiedzi mówi, ile ta pustka ma już lat. Nie da się tego obejść z przeglądarki — ani parametrem w URL-u, ani no-cache.`);
+                log(`${res.status} z ${url} — to źródło nie ma liczby dla tej ścieżki`);
                 continue;
               }
               // count_unique is documented as identical to count and kept only for
               // backwards compatibility — "should not be used for new code"
               ({ count } = await res.json());
             } catch (err) {
-              // network/CORS failure — retrying the other path would fail too
-              log(`żądanie do ${url} nie wyszło z przeglądarki (${err}) — najczęściej blokuje je bloker reklam albo ochrona przed śledzeniem`);
-              return;
+              log(`żądanie do ${url} nie wyszło z przeglądarki (${err}) — bloker, brak sieci albo host jeszcze nie istnieje; próbuję następne źródło`);
+              continue;
             }
             const n = Number(String(count).replace(/\D/g, ''));
             if (!n) {
-              log(`ścieżka ${path} ma zero wyświetleń — licznik zostaje ukryty`);
+              log(`${url} ma zero wyświetleń — pomijam`);
               continue;
+            }
+            // sources are ordered freshest-first, so the first hit decides; anything
+            // not newer than the build's number is the 4h cache lagging behind
+            if (n <= baked) {
+              log(`${url} zwróciło ${n}, nie więcej niż liczba z builda (${baked}) — zostaje liczba z builda`);
+              return;
             }
             const form = forms[new Intl.PluralRules(lang).select(n)] ?? forms.other;
             const views = document.getElementById('post-views');

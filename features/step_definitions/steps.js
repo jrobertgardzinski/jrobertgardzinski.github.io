@@ -455,12 +455,26 @@ Then('the post has no view counter', async function () {
   await expect(this.page.locator('.post-views')).toHaveCount(0);
 });
 
-// stubs the public counts endpoint — the hook aborts external requests, and a route
-// registered later wins, so this must run BEFORE the post page is opened.
-// The pattern deliberately spells out the real URL shape, double slash included
-// (/counter/ + the path *with* its leading slash): a page asking for the wrong URL
-// falls through to the aborting hook and leaves the counter hidden, failing the scenario.
+// stubs the counter's data sources — the hook aborts external requests, and a route
+// registered later wins, so these must run BEFORE the post page is opened.
+// The page walks two sources in order: the first-party proxy, then goatcounter.com
+// directly. The GC pattern deliberately spells out the real URL shape, double slash
+// included (/counter/ + the path *with* its leading slash): a page asking for the
+// wrong URL falls through to the aborting hook, failing the scenario. A scenario
+// that stubs only goatcounter.com therefore also proves the proxy-to-GC fallback:
+// the proxy request dies on the aborting hook first.
 const COUNTS_ENDPOINT = /goatcounter\.com\/counter\/\/[^?]*\.json$/;
+const PROXY_ENDPOINT = /wizyty\.jrobertgardzinski\.pl\//;
+
+Given('the views proxy reports {string} visits', async function (count) {
+  await this.context.route(PROXY_ENDPOINT, (route) =>
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ count }),
+    })
+  );
+});
 
 Given('GoatCounter reports {string} visits', async function (count) {
   await this.context.route(COUNTS_ENDPOINT, (route) =>
@@ -479,6 +493,14 @@ Given('GoatCounter has no data for this page', async function () {
 });
 
 Then('the post view counter shows {string}', async function (text) {
+  await expect(this.page.locator('.post-views')).toHaveText(text);
+});
+
+// for never-lower assertions: the build-rendered number matches immediately, so a
+// plain toHaveText could pass before the refresh script had a chance to (wrongly)
+// overwrite it — wait for the network to settle first, then assert
+Then('the post view counter settles on {string}', async function (text) {
+  await this.page.waitForLoadState('networkidle');
   await expect(this.page.locator('.post-views')).toHaveText(text);
 });
 
