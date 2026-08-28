@@ -1,5 +1,5 @@
 ---
-title: "Dwa lata w piaskownicy"
+title: "Piaskownica z memami"
 date: 2026-08-29
 section: it
 project: portal
