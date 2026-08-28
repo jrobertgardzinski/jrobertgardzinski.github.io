@@ -56,6 +56,10 @@ Czterdzieści commitów. Asysta przez schowek pomaga dokładnie tam, gdzie probl
 
 To był przeskok, ale nie taki, jakiego się spodziewałem: dwieście czterdzieści pięć commitów przez pół roku i dalej **te same trzy przypadki użycia**. Zaczynałem nieśmiało - zmień nazwę klasy, zrób code review - a skończyłem na prowadzeniu BDD przez wszystkie warstwy. Styczeń jest jedynym miesiącem w całej historii projektu, w którym skasowałem więcej linii, niż napisałem. Nie powstała wtedy żadna nowa funkcja. Powstała za to dyscyplina.
 
+Po drodze nakręciłem film z postępów:
+
+https://youtu.be/_sHEI4u_p5c
+
 ## Lipiec 2026: 716 commitów
 
 Wykupiłem Max 20x z jednym konkretnym zamiarem — zlecić agentowi warstwę infrastruktury, której nie chciało mi się klepać. W trakcie rozmowy okazało się, że skoro już, to wypadałoby dodać kilka przypadków użycia. Potem zacząłem zlecać tworzenie kolejnych serwisów na podobieństwo security. Do tego wrócił Fable 5, ogłaszany jako dostępny „przez tydzień", potem przez kolejny, więc zacząłem wyciskać z niego maksimum, zanim zniknie.
