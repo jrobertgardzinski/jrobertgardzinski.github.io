@@ -344,6 +344,12 @@ button { font-family: var(--mono); }
 /* plain links, the site's default colour and hover — the heading is the label */
 .profile-links { margin: 0; }
 .profile-links a { text-transform: none; letter-spacing: 0; }
+/* body copy, same voice as the intro paragraph — the heading above is the only mono here.
+   One item per line on a phone; on a desktop the items spread across the width */
+.stack-links { margin: 0; padding: 0; list-style: none; color: var(--text); display: flex; flex-direction: column; gap: 4px; }
+@media (min-width: 641px) {
+  .stack-links { flex-direction: row; flex-wrap: wrap; justify-content: space-between; gap: 6px 24px; }
+}
 
 /* ===== Footer ===== */
 .site-footer {

@@ -19,6 +19,17 @@ const LINKS = [
   { name: 'linkedin', href: SITE.linkedin },
   { name: 'youtube', href: SITE.youtube },
 ] as const;
+
+// the services this blog runs on — all of them visible in DNS, headers or
+// the page source anyway, so naming them here gives nothing away
+const STACK = [
+  { pl: 'generator', en: 'generator', name: 'astro', href: 'https://astro.build' },
+  { pl: 'hosting', en: 'hosting', name: 'github pages', href: 'https://pages.github.com' },
+  { pl: 'domena', en: 'domain', name: 'ovh', href: 'https://www.ovhcloud.com' },
+  { pl: 'licznik wizyt', en: 'visit counter', name: 'goatcounter', href: 'https://www.goatcounter.com' },
+  { pl: 'proxy licznika', en: 'counter proxy', name: 'deno deploy', href: 'https://deno.com/deploy' },
+  { pl: 'testy', en: 'tests', name: 'cucumber + playwright', href: 'https://cucumber.io' },
+] as const;
 ---
 <Base title={`About me — ${SITE.title}`} active="o-mnie">
   <main class="page about">
@@ -62,6 +73,15 @@ const LINKS = [
             <p>Od czasu do czasu coś mi się uda. Trzymam się przepisu jak specyfikacji.</p>
           </div>
         </div>
+      </section>
+
+      <section class="stack">
+        <h2 class="section-heading">// blog napędzany przez</h2>
+        <ul class="stack-links">
+          {STACK.map((t) => (
+            <li>{t.pl}: <a href={t.href} target="_blank" rel="noopener">{t.name}</a></li>
+          ))}
+        </ul>
       </section>
 
       <dialog class="lightbox" data-lightbox aria-label="Zdjęcie autora">
@@ -110,6 +130,15 @@ const LINKS = [
             <p>Every now and then something works out. I follow the recipe like a spec.</p>
           </div>
         </div>
+      </section>
+
+      <section class="stack">
+        <h2 class="section-heading">// blog powered by</h2>
+        <ul class="stack-links">
+          {STACK.map((t) => (
+            <li>{t.en}: <a href={t.href} target="_blank" rel="noopener">{t.name}</a></li>
+          ))}
+        </ul>
       </section>
 
       <dialog class="lightbox" data-lightbox aria-label="Author's photo">

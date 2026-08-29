@@ -19,6 +19,23 @@ Feature: About page
     And the footer has no link "github"
     And the footer has no link "linkedin"
 
+  Scenario: The stack the blog runs on
+    Given I open the about page
+    Then I see the section heading "// blog napędzany przez"
+    And the stack lists "hosting" as "github pages" at "https://pages.github.com"
+    And the stack lists "domena" as "ovh" at "https://www.ovhcloud.com"
+    When I switch the language to "EN"
+    Then I see the section heading "// blog powered by"
+    And the stack lists "domain" as "ovh" at "https://www.ovhcloud.com"
+
+  Scenario: The stack is one item per line on a phone
+    Given I open the about page on a phone
+    Then the stack items are stacked vertically
+
+  Scenario: The stack spreads across the width on desktop
+    Given I open the about page
+    Then the stack items sit side by side
+
   Scenario: The photo is centered on a phone
     Given I open the about page on a phone
     Then the photo is horizontally centered

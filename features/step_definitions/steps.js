@@ -431,7 +431,8 @@ Then('I see the code block header {string}', async function (filename) {
 });
 
 Then('I see the section heading {string}', async function (heading) {
-  await expect(this.page.locator('.section-heading').getByText(heading)).toBeVisible();
+  // the about page carries one copy per language; only the visible one counts
+  await expect(this.page.locator('.section-heading:visible').getByText(heading)).toBeVisible();
 });
 
 Then('the footer link {string} points to {string}', async function (name, href) {
@@ -444,6 +445,28 @@ Then('the footer has no link {string}', async function (name) {
 
 Then('the profile link {string} points to {string}', async function (name, href) {
   await expect(this.page.locator('.lang-block:not([hidden]) .profile-links').getByRole('link', { name, exact: true })).toHaveAttribute('href', href);
+});
+
+Then('the stack lists {string} as {string} at {string}', async function (role, name, href) {
+  const item = this.page.locator('.lang-block:not([hidden]) .stack-links li').filter({ hasText: `${role}:` });
+  await expect(item.getByRole('link', { name, exact: true })).toHaveAttribute('href', href);
+});
+
+const stackItemBoxes = async (world) => {
+  const items = world.page.locator('.lang-block:not([hidden]) .stack-links li');
+  return Promise.all((await items.all()).map((li) => li.boundingBox()));
+};
+
+Then('the stack items are stacked vertically', async function () {
+  const boxes = await stackItemBoxes(this);
+  for (let i = 1; i < boxes.length; i++) {
+    assert.ok(boxes[i].y >= boxes[i - 1].y + boxes[i - 1].height, `item ${i} shares a line with item ${i - 1}`);
+  }
+});
+
+Then('the stack items sit side by side', async function () {
+  const boxes = await stackItemBoxes(this);
+  assert.strictEqual(boxes[0].y, boxes[1].y, `first two items on different lines: y=${boxes[0].y} vs ${boxes[1].y}`);
 });
 
 Then('the profile links open in a new tab', async function () {
