@@ -12,6 +12,7 @@ export const SITE = {
   // — puste = brak linków „historia zmian" na wpisach
   repoUrl: '',
   linkedin: 'https://www.linkedin.com/in/robert-gardzi%C5%84ski-26559a188/',
+  youtube: 'https://www.youtube.com/@robertgardzinski2927',
   // shortname strony z disqus.com/admin — puste = komentarze pokazują placeholder
   disqusShortname: '',
   // kod z goatcounter.com (np. 'jrg' dla jrg.goatcounter.com) — puste = brak skryptu analityki

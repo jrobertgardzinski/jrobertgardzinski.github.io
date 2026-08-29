@@ -4,23 +4,17 @@ import { urlOf, excerptOf, readingTimeOf, fmtDate, langOf } from '../lib/posts';
 
 interface Props {
   post: Post;
-  /** hidden by default; home/about scripts show the card matching the active language */
+  /** hidden by default; the home script shows the card matching the active language */
   hidden?: boolean;
-  small?: boolean;
-  showDate?: boolean;
 }
-const { post, hidden = false, small = false, showDate = true } = Astro.props;
+const { post, hidden = false } = Astro.props;
 ---
-<section class:list={['featured-card', { small }]} data-lang={langOf(post)} hidden={hidden}>
+<section class="featured-card" data-lang={langOf(post)} hidden={hidden}>
   <p class="featured-label">{langOf(post) === 'pl' ? 'najnowszy wpis' : 'latest post'} · {langOf(post).toUpperCase()}</p>
-  {small ? (
-    <h3 class="featured-title"><a href={urlOf(post)}>{post.data.title}</a></h3>
-  ) : (
-    <h2 class="featured-title"><a href={urlOf(post)}>{post.data.title}</a></h2>
-  )}
+  <h2 class="featured-title"><a href={urlOf(post)}>{post.data.title}</a></h2>
   <p class="featured-excerpt">{excerptOf(post)}</p>
   <div class="featured-meta mono">
     <span class="featured-tags">{post.data.tags.map((t) => '#' + t).join(' ')}</span>
-    {showDate && <span class="featured-date">{fmtDate(post.data.date)} · {readingTimeOf(post)} min</span>}
+    <span class="featured-date">{fmtDate(post.data.date)} · {readingTimeOf(post)} min</span>
   </div>
 </section>

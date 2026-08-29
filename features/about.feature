@@ -1,6 +1,5 @@
 Feature: About page
-  The author's page: photo, intro, interest cards and a teaser
-  of the newest post.
+  The author's page: photo, intro, profile links and interest cards.
 
   Scenario: Header and interest cards
     Given I open the about page
@@ -10,17 +9,23 @@ Feature: About page
     And I see the card "diy"
     And I see the card "gotowanie"
 
-  Scenario: Newest post teaser
+  # the profiles moved out of the footer: they belong to the author, not to every page
+  Scenario: Profile links
     Given I open the about page
-    Then the featured post is "Hello World"
+    Then I see the section heading "// gdzie mnie znaleźć"
+    And the profile link "github" points to "https://github.com/jrobertgardzinski"
+    And the profile link "youtube" points to "https://www.youtube.com/@robertgardzinski2927"
+    And the profile links open in a new tab
+    And the footer has no link "github"
+    And the footer has no link "linkedin"
 
   Scenario: The photo is centered on a phone
     Given I open the about page on a phone
     Then the photo is horizontally centered
 
-  Scenario: The photo lines up with the title on desktop
+  Scenario: The photo sits at the top of the header on desktop
     Given I open the about page
-    Then the photo top lines up with the title
+    Then the photo top lines up with the intro
 
   Scenario: The photo really loads
     Given I open the about page

@@ -226,7 +226,7 @@ przenosi się między narzędziami, a stare liczby warto móc pokazać.
 
 ## Konfiguracja
 
-- `src/config.ts` — tytuł, opis, adresy github/linkedin, shortname Disqusa (puste do czasu rejestracji strony na disqus.com), liczba wpisów na stronę (12).
+- `src/config.ts` — tytuł, opis, adresy github/linkedin/youtube (sekcja „gdzie mnie znaleźć" na /o-mnie), shortname Disqusa (puste do czasu rejestracji strony na disqus.com), liczba wpisów na stronę (12).
 - `astro.config.mjs` — adres strony, sitemap, motyw kolorowania kodu (zmienne CSS → tokeny Darculi).
 - Tokeny kolorów obu motywów: `src/styles/global.css`.
 

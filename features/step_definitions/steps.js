@@ -74,10 +74,10 @@ Then('the photo is horizontally centered', async function () {
   assert.ok(Math.abs(center - viewport.width / 2) <= 2, `avatar center ${center}, viewport center ${viewport.width / 2}`);
 });
 
-Then('the photo top lines up with the title', async function () {
+Then('the photo top lines up with the intro', async function () {
   const avatar = await this.page.locator('.lang-block:not([hidden]) .avatar').boundingBox();
-  const title = await this.page.locator('.lang-block:not([hidden]) .about-title').boundingBox();
-  assert.ok(Math.abs(avatar.y - title.y) <= 3, `avatar y=${avatar.y}, title y=${title.y}`);
+  const intro = await this.page.locator('.lang-block:not([hidden]) .about-intro').boundingBox();
+  assert.ok(Math.abs(avatar.y - intro.y) <= 1, `avatar y=${avatar.y}, intro y=${intro.y}`);
 });
 
 // only the block for the current language is on screen — and so is its lightbox
@@ -436,6 +436,20 @@ Then('I see the section heading {string}', async function (heading) {
 
 Then('the footer link {string} points to {string}', async function (name, href) {
   await expect(this.page.locator('.site-footer').getByRole('link', { name, exact: true })).toHaveAttribute('href', href);
+});
+
+Then('the footer has no link {string}', async function (name) {
+  await expect(this.page.locator('.site-footer').getByRole('link', { name, exact: true })).toHaveCount(0);
+});
+
+Then('the profile link {string} points to {string}', async function (name, href) {
+  await expect(this.page.locator('.lang-block:not([hidden]) .profile-links').getByRole('link', { name, exact: true })).toHaveAttribute('href', href);
+});
+
+Then('the profile links open in a new tab', async function () {
+  const links = this.page.locator('.lang-block:not([hidden]) .profile-links a');
+  await expect(links).toHaveCount(3);
+  for (const link of await links.all()) await expect(link).toHaveAttribute('target', '_blank');
 });
 
 // ===== analytics =====
