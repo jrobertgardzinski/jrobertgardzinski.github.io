@@ -80,7 +80,8 @@ export interface PostGroup {
   date: Date;
   section: string;
   project: string;
-  tags: string[];
+  /** tags per language — a post's tags are written in the language of that post */
+  tags: Record<Lang, string[]>;
 }
 
 /** One list row per slug — a bilingual post (two files sharing a slug) becomes a single group. */
@@ -90,13 +91,14 @@ export function groupBySlug(posts: Post[]): PostGroup[] {
     const slug = slugOf(p);
     let g = map.get(slug);
     if (!g) {
-      g = { slug, langs: [], variants: {}, date: p.data.date, section: p.data.section, project: p.data.project ?? '', tags: [] };
+      g = { slug, langs: [], variants: {}, date: p.data.date, section: p.data.section, project: p.data.project ?? '', tags: { pl: [], en: [] } };
       map.set(slug, g);
     }
-    g.variants[langOf(p)] = p;
+    const lang = langOf(p);
+    g.variants[lang] = p;
     if (p.data.date > g.date) g.date = p.data.date;
     if (p.data.project) g.project = p.data.project;
-    for (const t of p.data.tags) if (!g.tags.includes(t)) g.tags.push(t);
+    for (const t of p.data.tags) if (!g.tags[lang].includes(t)) g.tags[lang].push(t);
   }
   for (const g of map.values()) {
     g.langs = (['pl', 'en'] as Lang[]).filter((l) => g.variants[l]);

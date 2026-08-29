@@ -45,7 +45,7 @@ title: "Fixture PL 01"
 date: 2026-03-01
 section: f1
 project: hexagon-demo
-tags: [spring, ddd]
+tags: [spring, ddd, sztuczki]
 excerpt: "Polski wpis testowy 01 (dział F1, projekt hexagon-demo, tagi spring i ddd)."
 `,
   'Polski wpis testowy 01 używany przez suitę BDD.'
@@ -99,7 +99,7 @@ for (let i = 1; i <= 13; i++) {
 title: "Fixture EN ${n}"
 date: 2026-02-${n}
 section: it
-tags: [fixture]
+tags: [fixture${i === 1 ? ', tricks' : ''}]
 excerpt: "English fixture post number ${n}."
 `,
     `English fixture post number ${n} used by the BDD suite.`

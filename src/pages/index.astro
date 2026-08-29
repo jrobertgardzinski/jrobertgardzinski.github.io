@@ -8,12 +8,28 @@ import { postCountLabel } from '../lib/i18n.js';
 
 const posts = await allPosts();
 const groups = groupBySlug(posts);
-const allTags = [...new Set(posts.flatMap((p) => p.data.tags))];
 const allProjects = [...new Set(posts.map((p) => p.data.project).filter(Boolean))] as string[];
 
 // projects and tags belong to sections — the chip rows narrow down to the selected section
 const sectionsOf = (matches: (p: (typeof posts)[number]) => boolean) =>
   [...new Set(posts.filter(matches).map((p) => p.data.section))].join(',');
+
+// Tags are written in the language of the post, so a tag used only by Polish
+// posts has no business in the English row and vice versa. A tag that appears in
+// both languages (claude, kafka, ddd — words that don't translate) is neutral and
+// stays in both rows; home.js hides the rest outside their own language.
+const tagLangs = new Map<string, Set<string>>();
+for (const p of posts) {
+  for (const t of p.data.tags) {
+    if (!tagLangs.has(t)) tagLangs.set(t, new Set());
+    tagLangs.get(t)!.add(langOf(p));
+  }
+}
+const tagChips = [...tagLangs].map(([tag, langs]) => ({
+  tag,
+  lang: langs.size === 1 ? [...langs][0] : undefined,
+  sections: sectionsOf((p) => p.data.tags.includes(tag)),
+}));
 const featuredPl = posts.find((p) => langOf(p) === 'pl');
 const featuredEn = posts.find((p) => langOf(p) === 'en');
 ---
@@ -48,10 +64,10 @@ const featuredEn = posts.find((p) => langOf(p) === 'en');
       </div>
       <div class="filter-row" data-filter="tags">
         <span class="filter-label" data-i18n-pl="tagi:" data-i18n-en="tags:">tagi:</span>
-        {allTags.map((t) => (
-          <button type="button" class="chip" data-value={t} data-sections={sectionsOf((post) => post.data.tags.includes(t))}>#{t}</button>
+        {tagChips.map((c) => (
+          <button type="button" class="chip" data-value={c.tag} data-lang={c.lang} data-sections={c.sections}>#{c.tag}</button>
         ))}
-        <span class="chip-none" hidden={allTags.length > 0}>–</span>
+        <span class="chip-none" hidden={tagChips.length > 0}>–</span>
       </div>
       <div class="filters-footer">
         <span id="result-count">{postCountLabel(groups.length, 'pl')}</span>
@@ -74,7 +90,8 @@ const featuredEn = posts.find((p) => langOf(p) === 'en');
             data-langs={g.langs.join(',')}
             data-section={g.section}
             data-project={g.project}
-            data-tags={g.tags.join(',')}
+            data-tags-pl={g.tags.pl.join(',')}
+            data-tags-en={g.tags.en.join(',')}
             data-search-pl={g.variants.pl && searchTextOf(g.variants.pl)}
             data-search-en={g.variants.en && searchTextOf(g.variants.en)}
             hidden={!g.langs.includes('pl')}

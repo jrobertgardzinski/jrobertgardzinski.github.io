@@ -27,7 +27,7 @@ function rowMatches(row, lang) {
     const text = row.dataset[lang === 'pl' ? 'searchPl' : 'searchEn'] || '';
     if (!text.includes(q)) return false;
   }
-  const tags = row.dataset.tags ? row.dataset.tags.split(',') : [];
+  const tags = (row.dataset[lang === 'pl' ? 'tagsPl' : 'tagsEn'] || '').split(',').filter(Boolean);
   for (const t of state.tags) if (!tags.includes(t)) return false;
   if (state.section && row.dataset.section !== state.section) return false;
   if (state.project && row.dataset.project !== state.project) return false;
@@ -53,13 +53,16 @@ function renderPager(pageCount) {
 
 // projects and tags belong to sections: with a section selected, only its chips
 // stay visible and active selections from outside of it are dropped;
-// a row with nothing left shows a dash
+// a row with nothing left shows a dash. Tag chips carry data-lang, so switching
+// the page language swaps the whole tag row and drops selections from the other one.
 function updateChipScope() {
+  const lang = getLang();
   for (const row of document.querySelectorAll('[data-filter="projects"], [data-filter="tags"]')) {
     let anyVisible = false;
     for (const chip of row.querySelectorAll('.chip')) {
       const sections = (chip.dataset.sections || '').split(',');
-      const show = !state.section || sections.includes(state.section);
+      const inLang = !chip.dataset.lang || chip.dataset.lang === lang;
+      const show = inLang && (!state.section || sections.includes(state.section));
       chip.hidden = !show;
       anyVisible = anyVisible || show;
       if (!show && chip.classList.contains('active')) {
@@ -86,6 +89,7 @@ function updateUrl() {
 
 function apply() {
   const lang = getLang();
+  updateChipScope();
   const matched = rows.filter((r) => rowMatches(r, lang));
   const pageCount = Math.max(1, Math.ceil(matched.length / PER_PAGE));
   state.page = Math.min(state.page, pageCount - 1);
