@@ -10,8 +10,11 @@ draft: false
 In writing on DDD or hexagonal architecture, configuration is rarely addressed head-on. At least not the way I think about it. For this post, take the rule: "after a purchase, the customer has 14 calendar days to report a return". And what if the law changes that deadline to 20 business days?
 
 The answer is: the rule would have to be reworded into something like "after a purchase, the customer has <RETURN_TIME> to report a return". RETURN_TIME would then consist of two values: a number and a unit of time (minutes, hours, calendar days, business days and so on). Depending on where and when the application reads that value, such a change would require:
+
 a) releasing a new version of the software,
+
 b) setting a property in the application.properties file (which would mean restarting the application),
+
 c) changing a setting in the database or on a configuration server - and then there is no need for a new release or a restart.
 
 ## Three levels of configuration

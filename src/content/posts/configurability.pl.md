@@ -10,8 +10,11 @@ draft: false
 W publikacjach na temat DDD lub architektury heksagonalnej rzadko pisze się wprost o konfiguracji. Przynajmniej w sposób, w jaki ja o tym myślę. Na potrzeby tego wpisu rozważmy regułę: "klient po zakupie ma 14 dni kalendarzowych na zgłoszenie zwrotu towaru". A co jeśli przepis zmieni ten termin na 20 dni roboczych?
 
 Odpowiedź brzmi: trzeba byłoby przeredagować regułę na coś w stylu: "klient po zakupie ma <RETURN_TIME> na zgłoszenie zwrotu towaru". Wówczas RETURN_TIME składałby się z dwóch wartości: liczby oraz jednostki czasu (minuty, godziny, dni kalendarzowe, dni robocze itd.). Zależnie od tego, skąd i kiedy aplikacja czyta tę wartość, zmiana taka wymagałaby:
+
 a) wydania nowej wersji oprogramowania,
+
 b) ustawienia właściwości w pliku application.properties (to wymagałoby zrestartowania aplikacji),
+
 c) zmiany ustawienia w bazie danych lub serwerze konfiguracyjnym - wówczas nie ma wymogu wydawania nowej wersji albo restartowania systemu.
 
 ## Trzy poziomy konfiguracji
