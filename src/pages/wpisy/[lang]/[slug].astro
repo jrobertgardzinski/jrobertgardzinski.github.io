@@ -5,6 +5,7 @@ import Footer from '../../../components/Footer.astro';
 import { SITE } from '../../../config';
 import { allPosts, slugOf, urlOf, excerptOf, readingTimeOf, updatedOf, fmtDate, langOf, type Post } from '../../../lib/posts';
 import { fetchViewCount, formatViews, VIEW_FORMS } from '../../../lib/views';
+import { formerPathsOf } from '../../../lib/renames.js';
 
 export async function getStaticPaths() {
   const posts = await allPosts();
@@ -84,7 +85,7 @@ const T = langOf(post) === 'pl'
     </header>
 
     {SITE.goatcounterCode && (
-      <script is:inline define:vars={{ code: SITE.goatcounterCode, proxy: SITE.viewsProxy, baked: views ?? 0, lang: langOf(post), forms: VIEW_FORMS[langOf(post)] }}>
+      <script is:inline define:vars={{ code: SITE.goatcounterCode, proxy: SITE.viewsProxy, baked: views ?? 0, lang: langOf(post), forms: VIEW_FORMS[langOf(post)], former: formerPathsOf(urlOf(post)) }}>
         // Refresh for the number already rendered above. The build baked in the count
         // it saw at deploy time (src/lib/views.ts); this walks fresher sources and
         // NEVER lowers or hides what the build put there — that is the whole point
@@ -96,6 +97,10 @@ const T = langOf(post) === 'pl'
         //      (EasyPrivacy carries `||goatcounter.com^$third-party`), which is
         //      exactly why the number is baked into the HTML and proxied at all.
         //
+        // Every source is asked about every address this post has ever had and the
+        // answers are added up: renaming a post's file moves its url but not the
+        // visits GoatCounter has already stored under the old one (src/lib/renames.js).
+        //
         // Doing nothing is the correct reader-facing behaviour but a terrible way to
         // debug, so every path out of here says WHY in the console:
         //   404 — the source has no number for this path. GoatCounter's public
@@ -105,46 +110,64 @@ const T = langOf(post) === 'pl'
         //         states, not faults.
         (async () => {
           const log = (msg) => console.info(`[views] ${msg}`);
-          const p = location.pathname;
+          const paths = [location.pathname, ...former];
+          // a source maps one blog path to the urls that may answer for it
           const sources = [];
-          if (proxy) sources.push(`${proxy}${p}`);
+          if (proxy) sources.push((path) => [`${proxy}${path}`]);
           // GoatCounter may have the path stored with or without the trailing slash;
           // its endpoint is /counter/ + the path *including* its leading slash, so a
           // real URL carries a double slash: /counter//wpisy/pl/slug/.json
-          const gcPaths = p.endsWith('/') && p !== '/' ? [p, p.slice(0, -1)] : [p];
-          for (const path of gcPaths) sources.push(`https://${code}.goatcounter.com/counter/${path}.json`);
-          for (const url of sources) {
-            let count;
-            try {
-              // no-store, because GoatCounter answers with `cache-control: public` and
-              // an `expires` hours ahead — and that covers its 404s too. Without it the
-              // browser replays the first miss from disk for the rest of the day.
-              const res = await fetch(url, { cache: 'no-store' });
-              if (!res.ok) {
-                log(`${res.status} z ${url} — to źródło nie ma liczby dla tej ścieżki`);
+          sources.push((path) =>
+            (path.endsWith('/') && path !== '/' ? [path, path.slice(0, -1)] : [path]).map(
+              (v) => `https://${code}.goatcounter.com/counter/${v}.json`
+            )
+          );
+
+          // urls here are spellings of ONE path, so the first number wins — summing
+          // them would count the same visits twice
+          const countFrom = async (urls) => {
+            for (const url of urls) {
+              let count;
+              try {
+                // no-store, because GoatCounter answers with `cache-control: public` and
+                // an `expires` hours ahead — and that covers its 404s too. Without it the
+                // browser replays the first miss from disk for the rest of the day.
+                const res = await fetch(url, { cache: 'no-store' });
+                if (!res.ok) {
+                  log(`${res.status} z ${url} — to źródło nie ma liczby dla tej ścieżki`);
+                  continue;
+                }
+                // count_unique is documented as identical to count and kept only for
+                // backwards compatibility — "should not be used for new code"
+                ({ count } = await res.json());
+              } catch (err) {
+                log(`żądanie do ${url} nie wyszło z przeglądarki (${err}) — bloker, brak sieci albo host jeszcze nie istnieje; próbuję następne źródło`);
                 continue;
               }
-              // count_unique is documented as identical to count and kept only for
-              // backwards compatibility — "should not be used for new code"
-              ({ count } = await res.json());
-            } catch (err) {
-              log(`żądanie do ${url} nie wyszło z przeglądarki (${err}) — bloker, brak sieci albo host jeszcze nie istnieje; próbuję następne źródło`);
-              continue;
+              const n = Number(String(count).replace(/\D/g, ''));
+              if (!n) {
+                log(`${url} ma zero wyświetleń — pomijam`);
+                continue;
+              }
+              return n;
             }
-            const n = Number(String(count).replace(/\D/g, ''));
-            if (!n) {
-              log(`${url} ma zero wyświetleń — pomijam`);
-              continue;
-            }
+            return 0;
+          };
+
+          for (const urlsFor of sources) {
+            let total = 0;
+            for (const path of paths) total += await countFrom(urlsFor(path));
+            // nothing from this source — blocked, unreachable or simply no data
+            if (!total) continue;
             // sources are ordered freshest-first, so the first hit decides; anything
             // not newer than the build's number is the 4h cache lagging behind
-            if (n <= baked) {
-              log(`${url} zwróciło ${n}, nie więcej niż liczba z builda (${baked}) — zostaje liczba z builda`);
+            if (total <= baked) {
+              log(`źródło zwróciło ${total}, nie więcej niż liczba z builda (${baked}) — zostaje liczba z builda`);
               return;
             }
-            const form = forms[new Intl.PluralRules(lang).select(n)] ?? forms.other;
+            const form = forms[new Intl.PluralRules(lang).select(total)] ?? forms.other;
             const views = document.getElementById('post-views');
-            views.textContent = `${n.toLocaleString(lang)} ${form}`;
+            views.textContent = `${total.toLocaleString(lang)} ${form}`;
             views.hidden = false;
             document.getElementById('post-views-sep').hidden = false;
             return;

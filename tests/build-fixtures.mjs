@@ -126,7 +126,14 @@ const clearCaches = async () => {
 // stays offline and the baked numbers stay the same on every run. Only one post
 // carries a count — the rest answer 404, which keeps the pages whose scenarios
 // stub the browser-side request free of a pre-rendered number.
-const COUNTS = { '/wpisy/pl/fixture-pl-01/': '22' };
+// "Fixture PL 02" additionally plays a post that was renamed (RENAMED_PATHS
+// below): its visits are split across its old and its current url, and the
+// counter has to add them up — 5 + 7 = 12.
+const COUNTS = {
+  '/wpisy/pl/fixture-pl-01/': '22',
+  '/wpisy/pl/fixture-pl-02/': '5',
+  '/wpisy/pl/stary-fixture/': '7',
+};
 const counts = createServer((req, res) => {
   // the real endpoint is /counter/ + the path *with* its leading slash → double slash
   const count = COUNTS[decodeURIComponent(req.url).replace(/^\/counter\//, '').replace(/\.json$/, '')];
@@ -139,6 +146,13 @@ const counts = createServer((req, res) => {
 });
 await new Promise((resolve) => counts.listen(0, '127.0.0.1', resolve));
 process.env.GOATCOUNTER_COUNTS_ORIGIN = `http://127.0.0.1:${counts.address().port}`;
+
+// A renamed fixture post, so the suite covers both halves of a slug change
+// (src/lib/renames.js) without pinning the real, ever-growing rename list:
+// the redirect from the old url, and the visits still stored under it.
+process.env.RENAMED_PATHS = JSON.stringify({
+  '/wpisy/pl/fixture-pl-02/': ['/wpisy/pl/stary-fixture/'],
+});
 
 process.env.POSTS_DIR = postsDir;
 await clearCaches();

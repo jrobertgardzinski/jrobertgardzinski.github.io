@@ -174,20 +174,25 @@ curl -s -o /dev/null -w '%{http_code}\n' https://jrobertgardzinski.goatcounter.c
 Statystyki lecą od pierwszego wejścia po deployu; lokalne wejścia z `localhost` nie są liczone,
 więc na `npm run dev` licznik nie pojawi się nigdy.
 
-**Licznik wizyt na wpisie** (`src/pages/wpisy/[lang]/[slug].astro`): belka wpisu dociąga liczbę
-z publicznego endpointu `https://<kod>.goatcounter.com/counter/<ścieżka>.json` i pokazuje ją z odmianą
-przez liczbę mnogą (`1 wizyta` / `3 wizyty` / `12 wizyt`, po angielsku `visit`/`visits`).
-Endpoint zwraca dwie liczby i bierzemy **`count_unique`, czyli wizyty** — nie `count`, czyli odsłony:
-dziesięć wejść tej samej osoby to jeden czytelnik, a nie dziesięciu. Ta sama liczba, którą panel
-GoatCountera pokazuje jako „visits".
-Żądanie idzie z `cache: 'no-store'` — patrz punkt 1 niżej, bez tego licznik potrafi zamarznąć na kilka
-godzin. Tego akurat **nie pokrywa suita BDD**: Playwright przechwytuje żądania przed cache'em
-przeglądarki, więc stub przechodzi tak samo z poprawką i bez niej.
+**Licznik wizyt na wpisie** (`src/pages/wpisy/[lang]/[slug].astro`): liczba jest pobierana **w trakcie
+builda** (`src/lib/views.ts`) i wpisana na stałe w HTML — dlatego widzą ją też czytelnicy z blokerem,
+który nie wypuszcza z urządzenia żadnego żądania do `goatcounter.com`. Skrypt na stronie już tylko ją
+odświeża i **nigdy jej nie obniża ani nie chowa**; pyta po kolei: najpierw first-party proxy
+(`wizyty.jrobertgardzinski.pl`, `proxy/README.md` — near-real-time, niewidoczne dla list filtrów),
+potem publiczny endpoint `https://<kod>.goatcounter.com/counter/<ścieżka>.json` (cache ~4 h,
+blokowalny). Liczba jest odmieniana przez liczbę mnogą (`1 wizyta` / `3 wizyty` / `12 wizyt`,
+po angielsku `visit`/`visits`).
+Endpoint zwraca dwie liczby, **`count` i `count_unique`, i są one identyczne** — `count_unique` to alias
+zostawiony dla wstecznej zgodności, o którym dokumentacja GoatCountera mówi wprost „should not be used
+for new code", więc kod czyta `count`. To ta sama liczba, którą panel pokazuje jako „visits".
+Żądanie z przeglądarki idzie z `cache: 'no-store'` — patrz punkt 1 niżej, bez tego licznik potrafi
+zamarznąć na kilka godzin. Tego akurat **nie pokrywa suita BDD**: Playwright przechwytuje żądania
+przed cache'em przeglądarki, więc stub przechodzi tak samo z poprawką i bez niej.
 Element renderuje się dopiero po wpisaniu `goatcounterCode`, a każda awaria — wyłączony endpoint,
 zablokowany request, strona bez jeszcze żadnej wizyty — po prostu zostawia licznik ukryty, więc belka
 nigdy nie pokazuje zera ani błędu. Liczby narastają od dnia włączenia analityki, historii nie da się odtworzyć.
 
-**Gdy licznik nic nie pokazuje** — to prawie zawsze jedna z dwóch rzeczy, a konsola przeglądarki mówi
+**Gdy licznik nic nie pokazuje** — to prawie zawsze jedna z trzech rzeczy, a konsola przeglądarki mówi
 która (każde wyjście z tego skryptu loguje `[views] …`):
 
 1. **Liczby są cache'owane w dwóch miejscach naraz — i dotyczy to także `404`.**
@@ -209,9 +214,25 @@ która (każde wyjście z tego skryptu loguje `[views] …`):
    Firefox ETP w trybie „ścisłym", Brave), więc **Ty** możesz nie widzieć licznika, choć czytelnicy widzą
    go normalnie. Sprawdzenie zajmuje sekundę: konsola pokaże `[views] żądanie … nie wyszło z przeglądarki`,
    a wejście w trybie prywatnym z wyłączonym blokerem pokaże liczbę.
+3. **Wpis zmienił nazwę pliku, czyli adres.** Wtedy pyta o ścieżkę, której GoatCounter nigdy nie
+   widział — patrz akapit o `src/lib/renames.js` niżej.
 
 Ścieżki GoatCounter zapisuje **bez końcowego ukośnika** (`/wpisy/pl/hello-world`), a strona pyta o oba
 warianty, więc to akurat nie jest źródłem problemów.
+
+**Zmiana nazwy pliku wpisu = zmiana adresu = utrata licznika** — GoatCounter kluczuje wizyty ścieżką
+i o zmianie nazwy nic nie wie, więc wpis pod nowym adresem pyta o ścieżkę, której serwis nigdy nie
+widział, dostaje `404` i licznik znika (tak stało się 2026-08-29 przy przejściu `malowanie` →
+`painting-tricks` i dwóch podobnych). Dlatego każdy taki ruch **trzeba dopisać do `src/lib/renames.js`**
+— mapa „obecny adres → adresy poprzednie". Czytają ją dwa miejsca:
+- `astro.config.mjs` — generuje ze starych adresów strony przekierowujące (meta refresh + canonical +
+  `noindex`; na GitHub Pages nie ma gdzie ustawić prawdziwego `301`), żeby stare linki i wyniki
+  wyszukiwania nie trafiały w 404;
+- licznik (`src/lib/views.ts` przy buildzie i skrypt na stronie wpisu) — pyta o **wszystkie** adresy
+  wpisu i **sumuje** wyniki, więc wizyty sprzed zmiany nazwy nie przepadają.
+
+Wpisy w mapie są dożywotnie: stary adres przekierowuje i dokłada swoje wizyty tak długo, jak wpis
+istnieje. Scenariusze `features/renamed-posts.feature` pilnują obu połówek.
 
 **Uwaga na przyszłość:** darmowy GoatCounter jest dla użytku **niekomercyjnego**. Gdy blog zacznie
 zarabiać (płatna współpraca), przejdź na Cloudflare Web Analytics (darmowy, bez tej klauzuli) albo

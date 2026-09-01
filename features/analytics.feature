@@ -12,9 +12,12 @@ Feature: Analytics (GoatCounter)
   the first-party proxy (wizyty.jrobertgardzinski.pl, invisible to blocklists,
   near-real-time), then goatcounter.com directly (blockable, ~4h cache).
 
+  A post that has been renamed is counted under every address it has ever had;
+  that half of the story lives in features/renamed-posts.feature.
+
   In this suite the build-time counts come from a local stub (tests/build-fixtures.mjs);
-  only "Fixture PL 01" has one, so the pages below start out without a number
-  unless a scenario says otherwise.
+  only "Fixture PL 01" and the renamed "Fixture PL 02" have one, so the pages
+  below start out without a number unless a scenario says otherwise.
 
   Note: the browser-side request uses cache:'no-store', because GoatCounter answers
   with headers that allow hours of caching — 404s included. No scenario covers

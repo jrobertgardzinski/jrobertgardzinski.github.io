@@ -525,6 +525,26 @@ Given('GoatCounter reports {string} visits', async function (count) {
   );
 });
 
+// A renamed post asks GoatCounter about every address it has ever had
+// (src/lib/renames.js), so this stub answers per path: a path that is not in the
+// table gets the 404 that a never-visited page would get.
+Given('GoatCounter reports these visits:', async function (table) {
+  const counts = new Map(table.hashes().map((row) => [row.path.replace(/\/$/, ''), row.count]));
+  await this.context.route(COUNTS_ENDPOINT, (route) => {
+    const path = decodeURIComponent(new URL(route.request().url()).pathname)
+      .replace(/^\/counter\//, '')
+      .replace(/\.json$/, '')
+      .replace(/\/$/, '');
+    const count = counts.get(path);
+    if (count === undefined) return route.fulfill({ status: 404, body: '' });
+    route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({ count, count_unique: '999999' }),
+    });
+  });
+});
+
 Given('GoatCounter has no data for this page', async function () {
   await this.context.route(COUNTS_ENDPOINT, (route) => route.fulfill({ status: 404, body: '' }));
 });
