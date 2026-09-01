@@ -30,11 +30,11 @@ Ad. c) konfiguracja na żywo (live config). Wartość leży w źródle dostępny
 
 Pójście w kierunku live config przy naszej regule mija się z celem. Rebuild config byłby wystarczający, bo takie przepisy zmieniają się rzadko i informacja o takiej zmianie jest podawana z wystarczającym wyprzedzeniem. Nietrudno jednak wymyślić reguły, gdzie wszystkie trzy poziomy mogą zagrać ważną rolę, np. weźmy na tapet próg darmowej dostawy.
 
-a) W kodzie siedzi wartość domyślna: 200 zł. Zmienia się tylko z wydaniem i to jest jej zaleta — gdy wszystko inne zawiedzie, sklep wciąż wie, od ilu wysyła za darmo.
+a) W kodzie siedzi wartość domyślna: 200 zł. Zmienia się tylko z wydaniem i to jest jej zaleta - gdy wszystko inne zawiedzie, sklep wciąż wie, od ilu wysyła za darmo.
 
-b) Konkurencja ogłasza darmową wysyłkę od 100 zł. Nie czekamy na wydanie: dopisujemy właściwość shipping.free-from=100 i restartujemy aplikację — wieczorem sklep liczy już po nowemu. Wartość w kodzie zostaje na 200 zł do najbliższego wydania, w którym domyślną też zmieniamy na 100.
+b) Konkurencja ogłasza darmową wysyłkę od 100 zł. Nie czekamy na wydanie: dopisujemy właściwość shipping.free-from=100 i restartujemy aplikację - wieczorem sklep liczy już po nowemu. Wartość w kodzie zostaje na 200 zł do najbliższego wydania, w którym domyślną też zmieniamy na 100.
 
-c) W Black Friday kierownik sprzedaży podnosi próg z panelu do 400 zł, żeby przy lawinie drobnych zamówień magazyn nie utonął w paczkach — działa od następnego zamówienia, bez restartu. A gdy w pośpiechu wpisze -400 albo «czterysta», walidacja odrzuci wartość i głos dostanie poziom niżej: 100 zł z restartu.
+c) W Black Friday kierownik sprzedaży podnosi próg z panelu do 400 zł, żeby przy lawinie drobnych zamówień magazyn nie utonął w paczkach - działa od następnego zamówienia, bez restartu. A gdy w pośpiechu wpisze -400 albo «czterysta», walidacja odrzuci wartość i głos dostanie poziom niżej: 100 zł z restartu.
 
 Inny przykład - linie lotnicze i chmura pyłu z islandzkiego wulkanu (2010):
 a) kwoty odszkodowań z rozporządzenia EU261 (250/400/600 EUR),

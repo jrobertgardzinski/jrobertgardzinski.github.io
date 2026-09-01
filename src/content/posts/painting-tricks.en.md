@@ -20,7 +20,7 @@ This keeps them from drying out. They'll survive several days like this.
 
 https://www.youtube.com/watch?v=amvry4CXXr8
 
-The trick demonstrated by Chris from remont4you should be familiar to many. Instead of juggling buckets, filling them with water and screwing the roller onto a long threaded rod, I prefer to pour water into the tray and roll along it, top to bottom, a few times over. The water sweeps the roller nicely — you can see how fast it gets dirty during the first passes, and how much less willing the water is to take on colour later on. I pour out the dirty water, add fresh, and squeeze the roller by hand wearing a rubber glove. I keep going until there's a visible band on the roller and the water is harder to colour. I really should record a video of this procedure one day.
+The trick demonstrated by Chris from remont4you should be familiar to many. Instead of juggling buckets, filling them with water and screwing the roller onto a long threaded rod, I prefer to pour water into the tray and roll along it, top to bottom, a few times over. The water sweeps the roller nicely - you can see how fast it gets dirty during the first passes, and how much less willing the water is to take on colour later on. I pour out the dirty water, add fresh, and squeeze the roller by hand wearing a rubber glove. I keep going until there's a visible band on the roller and the water is harder to colour. I really should record a video of this procedure one day.
 
 ## Scooping paint from the tin into the tray
 

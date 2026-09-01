@@ -30,11 +30,11 @@ Re c) live configuration (live config). The value lies in a source available at 
 
 Going for live config with our rule misses the point. Rebuild config would be enough, because regulations like that change rarely and the change is announced far enough in advance. It is not hard, though, to think of rules where all three levels have an important part to play. Take the free delivery threshold.
 
-a) The default value sits in the code: 200 PLN. It changes only with a release, and that is its strength — when everything else fails, the shop still knows the amount above which it ships for free.
+a) The default value sits in the code: 200 PLN. It changes only with a release, and that is its strength - when everything else fails, the shop still knows the amount above which it ships for free.
 
-b) A competitor announces free shipping from 100 PLN. We do not wait for a release: we add the property shipping.free-from=100 and restart the application — by the evening the shop is already counting the new way. The value in the code stays at 200 PLN until the next release, in which we change the default to 100 as well.
+b) A competitor announces free shipping from 100 PLN. We do not wait for a release: we add the property shipping.free-from=100 and restart the application - by the evening the shop is already counting the new way. The value in the code stays at 200 PLN until the next release, in which we change the default to 100 as well.
 
-c) On Black Friday the sales manager raises the threshold from the panel to 400 PLN, so that a flood of small orders does not bury the warehouse in parcels — it works from the next order on, with no restart. And when, in a hurry, they type -400 or «four hundred», validation rejects the value and it falls back to the level below: 100 PLN from the restart.
+c) On Black Friday the sales manager raises the threshold from the panel to 400 PLN, so that a flood of small orders does not bury the warehouse in parcels - it works from the next order on, with no restart. And when, in a hurry, they type -400 or «four hundred», validation rejects the value and it falls back to the level below: 100 PLN from the restart.
 
 Another example - airlines and the ash cloud from the Icelandic volcano (2010):
 a) the compensation amounts from regulation EU261 (250/400/600 EUR),

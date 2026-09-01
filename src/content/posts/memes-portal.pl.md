@@ -35,7 +35,7 @@ Projekt założylem w czerwcu 2024 roku. Ponad rok zajęło mi poskładanie wszy
 Etap ten zbiegł się z przebudową hexagona w moim projekcie. Stwierdziłem, że 3 warstwy to dla mnie za mało i wydzieliłem:
 * domain,
 * config - wyspecjalizowana domena skupiona na konfiguracji, np. konfigurowalna polityka haseł (dłguość hasła, regex pod wymaganie znaków specjalnych, itd.)
-* system - pojemnik na przypadki użycia: odśwież sesję;
+* system - pojemnik na przypadki użycia: odśwież sesję.
 * application - gdy system to za mało. Aby zarejestrować użytkownika, należy sprawdzić, czy email nie jest już zajęty, albo czy polityka haseł została spełniona. Uwierzytelnianie z zabezpieczeniem na brute force to już w ogóle! Licznik blokady: inkrementacja na niepowodzenie uwierzytelniania albo wyzerowanie przy udanej próbie zalogowania lub po ustawieniu blokady czasowej na uwierzytelnianie. Brute force też dobrze żeby raz zablokował dostęp na 10 minut, potem na 3, żeby utrudnić robotę botowi. Dopiero gdzieś na końcu pojawia się szczęśliwe zakończenie, czyli udana próba zalogowania.
 
 ### Claude Code (taryfa Pro) (01.2026-06.2026)
