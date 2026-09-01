@@ -10,7 +10,7 @@ draft: false
 
 There are three things I can do in this project today: start it, click around, and complain that I'd have done some parts better. Claude writes the code.
 
-This isn't a complaint. It's a summary of a project I started so that I could rebuild, from scratch and after hours, the topics that interest me: distributed transactions, a few flavours of the JVM, observability, preparing for a cluster deployment. In July I lost control of my own sandbox, even though the system stands, runs and has tests.
+This isn't a complaint. It's a summary of a project I started to work through the topics I find interesting from scratch, after hours: distributed transactions, a few JVM flavours, observability, getting ready to deploy on a cluster. In July I lost control of my own sandbox, even though the system is up, it works and it has tests.
 
 ## Why memes, of all things
 
@@ -47,10 +47,10 @@ https://youtu.be/nX685z_-UNQ
 Forty commits. Assistance through the clipboard helps exactly where the problem fits into one file and one question — for me that was password hashing and class naming. The architecture was still being built by hand. That's also when I split the three layers into five, because domain and application aren't enough for me.
 
 * domain,
-* config — a specialised domain focused on configuration, e.g. a configurable password policy (password length, a regex for special character requirements, and so on)
-* system — a container for use cases: refresh the session;
+* config — a specialised domain focused on configuration, e.g. a configurable password policy (password length, a regex for special character requirements, and so on).
+* system — a container for use cases: refresh the session.
 * application — when system isn't enough and you need an orchestrator of use cases. To register a user, you have to check whether the email is already taken, or whether the password policy has been satisfied. Authentication with brute force protection is a whole other story! The lockout counter: incremented on a failed authentication, or zeroed on a successful login or after setting a time-based authentication lock. It's also good if brute force protection blocks access for 10 minutes the first time, then for 3, to make the bot's job harder. Only somewhere at the very end does the happy ending appear, i.e. a successful login attempt.
-* infrastructure
+* infrastructure.
 
 **January – June 2026: Claude Code on the Pro plan.**
 
@@ -82,7 +82,7 @@ I wanted to get to know other frameworks. I know Spring well, and that's exactly
 
 **A saga that deleted blindly.** Deleting an account has to pass through five services: memes, comments, collections, security and the orchestrator. The first version shipped on 11 July and looked finished — until I asked what would happen if the third participant refused. The answer: nothing. It deleted everything in sequence, with no compensation and no way back. I had to push hard to get it rebuilt. The "hide first, delete later" rule and the first green run of the compensation tests are dated **8 August** — four weeks after the topic was "done".
 
-**A model living in 2024.** The infrastructure came together quickly and smoothly, only based on tool versions from around the model's cutoff date. The k8s manifests written on 25 July 2026 carried a 2023 baseline from day one. The Maven and npm trees were fresh, because Dependabot was watching those; nobody was watching the images and actions. A commit from 30 July titled "images and actions stop being a souvenir of the model's cutoff date" brought them up to current versions, and Postgres 18 immediately demanded a different volume layout than the one the agent had generated.
+**A model living in 2024.** The infrastructure came together quickly and smoothly, only based on tool versions from around the model's cutoff date. The k8s manifests written on 25 July 2026 carried a 2023 baseline from day one. The Maven and npm trees were fresh, because Dependabot was watching those. Nobody was watching the images and actions. A commit from 30 July titled "images and actions stop being a souvenir of the model's cutoff date" brought them up to current versions, and Postgres 18 immediately demanded a different volume layout than the one the agent had generated.
 
 | tool | agent generated | after the update |
 |---|---|---|
