@@ -7,17 +7,20 @@ Feature: Analytics (GoatCounter)
   The number is fetched while the site BUILDS and written into the HTML.
   goatcounter.com is on the standard tracker blocklists, so on the browsers that
   block by default — most of the mobile ones — a request made from the page never
-  leaves the device, and the counter used to be missing there. The page then
-  refreshes the number — never lowering or hiding it — from two sources in order:
-  the first-party proxy (wizyty.jrobertgardzinski.pl, invisible to blocklists,
-  near-real-time), then goatcounter.com directly (blockable, ~4h cache).
+  leaves the device, and the counter used to be missing there. Build and page
+  walk the same two sources in the same order: the first-party proxy
+  (wizyty.jrobertgardzinski.pl, invisible to blocklists, near-real-time), then
+  goatcounter.com directly (blockable, ~4h cache, and known to lag behind the
+  API by whole visits). The page only ever moves the built-in number forward —
+  it never lowers or hides it.
 
   A post that has been renamed is counted under every address it has ever had;
   that half of the story lives in features/renamed-posts.feature.
 
-  In this suite the build-time counts come from a local stub (tests/build-fixtures.mjs);
-  only "Fixture PL 01" and the renamed "Fixture PL 02" have one, so the pages
-  below start out without a number unless a scenario says otherwise.
+  In this suite the build-time counts come from a local stub playing both sources
+  (tests/build-fixtures.mjs); only "Fixture PL 01" and the renamed "Fixture PL 02"
+  have one, so the pages below start out without a number unless a scenario says
+  otherwise.
 
   Note: the browser-side request uses cache:'no-store', because GoatCounter answers
   with headers that allow hours of caching — 404s included. No scenario covers

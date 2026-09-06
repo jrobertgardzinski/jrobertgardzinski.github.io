@@ -121,22 +121,31 @@ const clearCaches = async () => {
   await rm('node_modules/.astro', { recursive: true, force: true });
 };
 
-// Visit counts are read from GoatCounter while the site builds (src/lib/views.ts),
-// so the fixture build gets its own stub instead of the real service: the suite
-// stays offline and the baked numbers stay the same on every run. Only one post
-// carries a count — the rest answer 404, which keeps the pages whose scenarios
-// stub the browser-side request free of a pre-rendered number.
+// Visit counts are read while the site builds (src/lib/views.ts) — from the
+// first-party proxy first, then from GoatCounter's public counter endpoint — so
+// the fixture build gets one stub playing both instead of the real services:
+// the suite stays offline and the baked numbers stay the same on every run.
+// Only two posts carry a count — the rest answer 404, which keeps the pages
+// whose scenarios stub the browser-side request free of a pre-rendered number.
 // "Fixture PL 02" additionally plays a post that was renamed (RENAMED_PATHS
 // below): its visits are split across its old and its current url, and the
-// counter has to add them up — 5 + 7 = 12.
-const COUNTS = {
+// counter has to add them up — 5 + 7 = 12. Its old url is known to the
+// GoatCounter half of the stub only, so that sum also proves the build falls
+// back to the public endpoint when the proxy has nothing for a path.
+const PROXY_COUNTS = {
   '/wpisy/pl/fixture-pl-01/': '22',
   '/wpisy/pl/fixture-pl-02/': '5',
+};
+const GOATCOUNTER_COUNTS = {
   '/wpisy/pl/stary-fixture/': '7',
 };
 const counts = createServer((req, res) => {
-  // the real endpoint is /counter/ + the path *with* its leading slash → double slash
-  const count = COUNTS[decodeURIComponent(req.url).replace(/^\/counter\//, '').replace(/\.json$/, '')];
+  const url = decodeURIComponent(req.url);
+  // the proxy answers GET <blog path>; the real GoatCounter endpoint is
+  // /counter/ + the path *with* its leading slash → double slash, plus .json
+  const count = url.startsWith('/counter/')
+    ? GOATCOUNTER_COUNTS[url.replace(/^\/counter\//, '').replace(/\.json$/, '')]
+    : PROXY_COUNTS[url];
   if (!count) {
     res.writeHead(404);
     return res.end('');
@@ -145,7 +154,8 @@ const counts = createServer((req, res) => {
   res.end(JSON.stringify({ count, count_unique: '999999' }));
 });
 await new Promise((resolve) => counts.listen(0, '127.0.0.1', resolve));
-process.env.GOATCOUNTER_COUNTS_ORIGIN = `http://127.0.0.1:${counts.address().port}`;
+process.env.VIEWS_PROXY_ORIGIN = `http://127.0.0.1:${counts.address().port}`;
+process.env.GOATCOUNTER_COUNTS_ORIGIN = process.env.VIEWS_PROXY_ORIGIN;
 
 // A renamed fixture post, so the suite covers both halves of a slug change
 // (src/lib/renames.js) without pinning the real, ever-growing rename list:

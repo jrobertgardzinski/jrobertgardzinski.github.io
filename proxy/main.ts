@@ -63,9 +63,18 @@ async function fetchCount(path: string): Promise<number> {
     include_paths: variants.map((v) => v.toLowerCase()).join(","),
   });
 
-  const res = await fetch(`https://${CODE}.goatcounter.com/api/v0/stats/total?${qs}`, {
-    headers: { Authorization: `Bearer ${TOKEN}` },
-  });
+  const url = `https://${CODE}.goatcounter.com/api/v0/stats/total?${qs}`;
+  let res = await fetch(url, { headers: { Authorization: `Bearer ${TOKEN}` } });
+  // The API allows 4 requests per second and answers a burst with 429 plus
+  // Retry-After. A site build asks about every post in a row and hits that
+  // even when it paces itself, so honour the header once before giving up —
+  // the limiter forgets a burst within a second.
+  if (res.status === 429) {
+    const after = Number(res.headers.get("retry-after")) || 1;
+    await res.body?.cancel();
+    await new Promise((resolve) => setTimeout(resolve, Math.min(after, 5) * 1000));
+    res = await fetch(url, { headers: { Authorization: `Bearer ${TOKEN}` } });
+  }
   if (!res.ok) throw new Error(`GoatCounter API: ${res.status} ${await res.text()}`);
   // "Total number of visitors (including events)" — the blog registers no events
   const { total } = await res.json();

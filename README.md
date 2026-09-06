@@ -176,12 +176,14 @@ więc na `npm run dev` licznik nie pojawi się nigdy.
 
 **Licznik wizyt na wpisie** (`src/pages/wpisy/[lang]/[slug].astro`): liczba jest pobierana **w trakcie
 builda** (`src/lib/views.ts`) i wpisana na stałe w HTML — dlatego widzą ją też czytelnicy z blokerem,
-który nie wypuszcza z urządzenia żadnego żądania do `goatcounter.com`. Skrypt na stronie już tylko ją
-odświeża i **nigdy jej nie obniża ani nie chowa**; pyta po kolei: najpierw first-party proxy
-(`wizyty.jrobertgardzinski.pl`, `proxy/README.md` — near-real-time, niewidoczne dla list filtrów),
-potem publiczny endpoint `https://<kod>.goatcounter.com/counter/<ścieżka>.json` (cache ~4 h,
-blokowalny). Liczba jest odmieniana przez liczbę mnogą (`1 wizyta` / `3 wizyty` / `12 wizyt`,
-po angielsku `visit`/`visits`).
+który nie wypuszcza z urządzenia żadnego żądania do `goatcounter.com`. Build i skrypt na stronie pytają
+te same źródła w tej samej kolejności: najpierw first-party proxy (`wizyty.jrobertgardzinski.pl`,
+`proxy/README.md` — API z tokenem, near-real-time, niewidoczne dla list filtrów), potem publiczny
+endpoint `https://<kod>.goatcounter.com/counter/<ścieżka>.json` (cache ~4 h, blokowalny, i do tego
+**zaniżony względem API o całe wizyty** — 2026-09-06 angielskie wpisy miały w API po 1 wizycie, a
+publiczny endpoint odpowiadał 404; build, który pytał tylko jego, wypiekał wtedy pustkę). Skrypt na
+stronie już tylko odświeża liczbę z builda i **nigdy jej nie obniża ani nie chowa**. Liczba jest
+odmieniana przez liczbę mnogą (`1 wizyta` / `3 wizyty` / `12 wizyt`, po angielsku `visit`/`visits`).
 Endpoint zwraca dwie liczby, **`count` i `count_unique`, i są one identyczne** — `count_unique` to alias
 zostawiony dla wstecznej zgodności, o którym dokumentacja GoatCountera mówi wprost „should not be used
 for new code", więc kod czyta `count`. To ta sama liczba, którą panel pokazuje jako „visits".
