@@ -121,4 +121,10 @@ But two years of this project taught me something less comforting. **You can del
 
 So the plan for the coming months is boring and will deliberately stay that way: walk through the infrastructure with my own eyes, close out the review packages, sort out GDPR, and only then think about deployment. No rush, because this is still a sandbox - and from a sandbox I ask one thing: that I learn something in it. The rest can wait.
 
+## Update, 7 September 2026
+
+I recorded a video on the progress in week 37. This time I focused on the user interface.
+
+https://youtu.be/vSgeXlZorNg
+
 <p class="mono-comment">// project: 23 repositories, 1118 commits, four JVM frameworks and one owner catching up</p>

@@ -121,4 +121,10 @@ Ale dwa lata tego projektu nauczyły mnie czegoś mniej pocieszającego. **Zleci
 
 Więc plan na najbliższe miesiące jest nudny i celowo taki zostanie: przejść przez infrastrukturę własnymi oczami, domknąć paczki z review, ogarnąć RODO, a dopiero potem myśleć o wdrożeniu. Bez pośpiechu, bo to nadal jest piaskownica - a od piaskownicy wymagam jednego: żebym się w niej czegoś nauczył. Reszta może poczekać.
 
+## Dopisek z 7 września 2026
+
+Nagrałem film z postępów za tydzień 37. Tym razem skupiłem się na interfejsie użytkownika.
+
+https://youtu.be/vSgeXlZorNg
+
 <p class="mono-comment">// projekt: 23 repozytoria, 1118 commitów, cztery frameworki JVM i jeden właściciel, który nadrabia zaległości</p>
