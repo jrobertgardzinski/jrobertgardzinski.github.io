@@ -60,6 +60,47 @@ Do live config powinna zostać przypisana gwiazdka z następującymi uwagami:
 
 W poniższym filmie przedstawiam tę koncepcję na prostym scenariuszu: minimalna długość hasła przy rejestracji nowego użytkownika. Spróbuję wymusić minimum 3 znaki, podczas gdy kod pilnuje, żeby nie zejść poniżej 5. Najpierw z panelu administracyjnego, a gdy system odmówi - bezpośrednio w bazie. Niepoprawny klucz zostaje pominięty z ostrzeżeniem w logu, a głos dostaje poziom niżej.
 
-Scenariusze z filmu opisane w Gherkinie: [LINK DO PLIKU FEATURE]
+https://youtu.be/npT2MQl-gAM
 
-[FILM]
+Scenariusze z filmu opisane w Gherkinie: [config-ladder.feature](https://github.com/jrobertgardzinski/config/blob/2c804e3191f9115627d09c56cf3c390693ebd912/src/test/resources/com/jrobertgardzinski/config/ladder/config-ladder.feature#L18-L53)
+
+Skopiowana treść poniżej, bez klikania:
+
+```gherkin
+Rule: the highest legal rung answers
+
+  Scenario Outline: a ladder over all three levels
+    Given a ladder for "min.length" with rungs live, restart and rebuild default <rebuild>
+    And the property "min.length" is <restart>
+    And the database row "min.length" <live>
+    Then the ladder answers <answer>
+
+    Examples: every level legal - the latest bound wins
+      | rebuild | restart   | live      | answer |
+      | 8       | set to 12 | holds 10  | 10     |
+      | 8       | set to 12 | is absent | 12     |
+      | 8       | unset     | is absent | 8      |
+
+    Examples: an illegal row is skipped, not repaired
+      | rebuild | restart   | live      | answer |
+      | 8       | set to 12 | holds 3   | 12     |
+      | 8       | unset     | holds 3   | 8      |
+
+  Scenario: a ladder without a live rung never reads the row
+    Given a ladder for "cache.ttl" with rungs restart and rebuild default 10
+    And the property "cache.ttl" is set to 30
+    And the database row "cache.ttl" holds 60
+    Then the ladder answers 30
+
+  Scenario: a ladder without a restart rung never reads the property
+    Given a ladder for "free.shipping.from" with rungs live and rebuild default 200
+    And the property "free.shipping.from" is set to 100
+    And the database row "free.shipping.from" is absent
+    Then the ladder answers 200
+
+  Scenario: a ladder of the rebuild default alone is a named constant
+    Given a ladder for "return.days" with rungs rebuild default 14
+    And the property "return.days" is set to 20
+    And the database row "return.days" holds 30
+    Then the ladder answers 14
+```
