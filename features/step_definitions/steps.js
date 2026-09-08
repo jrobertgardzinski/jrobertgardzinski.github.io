@@ -598,3 +598,7 @@ Then('the link preview image is {string}', async function (url) {
 Then('the link preview type is {string}', async function (type) {
   await expect(this.page.locator('meta[property="og:type"]')).toHaveAttribute('content', type);
 });
+
+Then('the link preview locale is {string}', async function (locale) {
+  await expect(this.page.locator('meta[property="og:locale"]')).toHaveAttribute('content', locale);
+});

@@ -10,6 +10,7 @@ Feature: Link preview (Open Graph)
     And the link preview description mentions "hexagonal architecture"
     And the link preview image is "https://jrobertgardzinski.pl/og.png"
     And the link preview type is "website"
+    And the link preview locale is "en_US"
 
   Scenario: The about page presents the author
     Given I open the about page
@@ -20,3 +21,4 @@ Feature: Link preview (Open Graph)
     Then the link preview title is "Hello World"
     And the link preview description mentions "Pierwszy wpis"
     And the link preview type is "article"
+    And the link preview locale is "pl_PL"

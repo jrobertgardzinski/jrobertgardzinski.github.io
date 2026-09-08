@@ -21,7 +21,7 @@ interface Props {
   /** external canonical address for syndicated content; defaults to the page's own URL */
   canonicalUrl?: string;
   /** what the link card says when the page is shared (LinkedIn, Slack, …); defaults to title + description */
-  social?: { title?: string; description?: string };
+  social?: { title?: string; description?: string; lang?: 'pl' | 'en' };
   /** posts are articles for Open Graph; everything else is a website */
   ogType?: 'website' | 'article';
   /** ISO date, only meaningful for articles */
@@ -38,7 +38,9 @@ const pageUrl = new URL(Astro.url.pathname, Astro.site).href;
 const ogTitle = social.title ?? title;
 const ogDescription = social.description ?? description;
 const ogImage = new URL('/og.png', Astro.site).href; // tools/brand-gen.mjs
-const ogLocale = lang === 'pl' ? 'pl_PL' : 'en_US';
+// the locale follows the card's copy, not the page's html lang — the home page
+// reads Polish by default but introduces itself in English
+const ogLocale = (social.lang ?? lang) === 'pl' ? 'pl_PL' : 'en_US';
 ---
 <!doctype html>
 <html lang={lang} data-theme="dark">

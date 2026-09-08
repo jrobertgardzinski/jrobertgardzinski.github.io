@@ -7,6 +7,7 @@ export const SITE = {
   // the link card for the home and about pages: who the author is, not what the
   // latest post was. English, because the link travels further than Polish does
   social: {
+    lang: 'en',
     title: 'Robert Gardziński · Java developer',
     description:
       'Java backend: Spring, hexagonal architecture, DDD and the conviction that good code reads like good prose. Posts in Polish and English.',
