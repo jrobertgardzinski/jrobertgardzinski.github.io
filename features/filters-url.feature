@@ -5,14 +5,20 @@ Feature: Filter state in the URL
   entering the list from the menu gives a clean slate; filter links are
   shareable. A "wyczyść" button shows up only when any filter is set.
 
+  # the fixtures behind these filters are Polish posts, and the site opens in
+  # English (language.feature), so the Polish view is chosen up front
   Scenario: Filters can be preset via URL parameters
-    Given I open the home page with query "?section=f1&project=hexagon-demo"
+    Given I open the home page
+    And I switch the language to "PL"
+    When I open the home page with query "?section=f1&project=hexagon-demo"
     Then I see 1 post in the list
     And the section chip "F1" is active
     And the project chip "hexagon-demo" is active
 
   Scenario: Tags can be preset via URL parameters
-    Given I open the home page with query "?tags=spring,ddd"
+    Given I open the home page
+    And I switch the language to "PL"
+    When I open the home page with query "?tags=spring,ddd"
     Then I see 1 post in the list
     And the tag chip "spring" is active
 
@@ -37,14 +43,14 @@ Feature: Filter state in the URL
 
   Scenario: Entering the list from the menu clears the filters
     Given I open the home page with query "?section=f1"
-    When I click "wpisy" in the menu
+    When I click "posts" in the menu
     Then no filter is active
-    And I see 4 posts in the list
+    And I see 12 posts in the list
 
   Scenario: The clear-filters button appears only when filters are set
     Given I open the home page
     Then the clear-filters button is hidden
-    When I click the tag "ddd"
+    When I click the tag "tricks"
     Then the clear-filters button is visible
     When I click the clear-filters button
     Then no filter is active

@@ -1,9 +1,11 @@
 // Shared chrome behavior: theme toggle + language switch, both persisted in localStorage.
+import { DEFAULT_LANG } from '../lib/i18n.js';
+
 const THEME_KEY = 'theme';
 const LANG_KEY = 'lang';
 const html = document.documentElement;
 
-export const getLang = () => localStorage.getItem(LANG_KEY) || 'pl';
+export const getLang = () => localStorage.getItem(LANG_KEY) || DEFAULT_LANG;
 
 const themeToggle = document.getElementById('theme-toggle');
 const langButtons = { pl: document.getElementById('lang-pl'), en: document.getElementById('lang-en') };

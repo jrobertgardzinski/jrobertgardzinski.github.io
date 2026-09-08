@@ -1,5 +1,6 @@
 ---
 import { SITE } from '../config';
+import { DEFAULT_LANG } from '../lib/i18n.js';
 import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/400-italic.css';
 import '@fontsource/jetbrains-mono/500.css';
@@ -28,7 +29,7 @@ interface Props {
   published?: string;
 }
 const {
-  title, description = SITE.description, lang = 'pl', active = '', counterpart, canonicalUrl,
+  title, description = SITE.description, lang = DEFAULT_LANG, active = '', counterpart, canonicalUrl,
   social = {}, ogType = 'website', published,
 } = Astro.props;
 const canonical = canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).href;
@@ -41,6 +42,9 @@ const ogImage = new URL('/og.png', Astro.site).href; // tools/brand-gen.mjs
 // the locale follows the card's copy, not the page's html lang — the home page
 // reads Polish by default but introduces itself in English
 const ogLocale = (social.lang ?? lang) === 'pl' ? 'pl_PL' : 'en_US';
+// the chrome is rendered in the default language; site.js re-labels it from the saved choice
+const NAV = { pl: { posts: 'wpisy', about: 'o-mnie', nav: 'nawigacja główna', theme: 'Przełącz motyw' },
+              en: { posts: 'posts', about: 'about-me', nav: 'main navigation', theme: 'Toggle theme' } }[DEFAULT_LANG];
 ---
 <!doctype html>
 <html lang={lang} data-theme="dark">
@@ -80,7 +84,7 @@ const ogLocale = (social.lang ?? lang) === 'pl' ? 'pl_PL' : 'en_US';
   </head>
   <body data-counterpart-pl={counterpart?.pl} data-counterpart-en={counterpart?.en}>
     <div class="shell">
-      <nav class="top-nav" aria-label="nawigacja główna">
+      <nav class="top-nav" aria-label={NAV.nav}>
         <div class="brand-block">
           <a class="brand" href="/" aria-label="jRobertGardzinski">
             {/* pixel-art wordmark (transparent — no tile); the narrow layout swaps it for the
@@ -97,7 +101,7 @@ const ogLocale = (social.lang ?? lang) === 'pl' ? 'pl_PL' : 'en_US';
           </a>
           {/* settings, not navigation — always at hand, also on mobile */}
           <div class="site-controls">
-            <button id="theme-toggle" title="Przełącz motyw" type="button">Darcula</button>
+            <button id="theme-toggle" title={NAV.theme} type="button">Darcula</button>
             <div class="lang-switch">
               <button id="lang-pl" class="lang-btn" type="button">PL</button>
               <button id="lang-en" class="lang-btn" type="button">EN</button>
@@ -108,8 +112,8 @@ const ogLocale = (social.lang ?? lang) === 'pl' ? 'pl_PL' : 'en_US';
           <span></span><span></span><span></span>
         </button>
         <div class="nav-right">
-          <a class:list={['nav-link', { active: active === 'wpisy' }]} href="/" data-label-pl="wpisy" data-label-en="posts">wpisy</a>
-          <a class:list={['nav-link', { active: active === 'o-mnie' }]} href="/o-mnie/" data-label-pl="o-mnie" data-label-en="about-me">o-mnie</a>
+          <a class:list={['nav-link', { active: active === 'wpisy' }]} href="/" data-label-pl="wpisy" data-label-en="posts">{NAV.posts}</a>
+          <a class:list={['nav-link', { active: active === 'o-mnie' }]} href="/o-mnie/" data-label-pl="o-mnie" data-label-en="about-me">{NAV.about}</a>
         </div>
       </nav>
       <slot />

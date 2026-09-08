@@ -2,8 +2,11 @@ Feature: Home page — post list, search and filters
   The post list with search and section/project/tag filters.
   All filters combine with AND; any change resets pagination to page 1.
 
+  # the site opens in English (language.feature); the filter fixtures are
+  # Polish posts, so the list is flipped to Polish before every scenario
   Background:
     Given I open the home page
+    And I switch the language to "PL"
 
   Scenario: The list shows posts with a counter and a featured post
     Then I see 4 posts in the list

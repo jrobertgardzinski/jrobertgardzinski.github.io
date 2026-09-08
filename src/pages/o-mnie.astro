@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Footer from '../components/Footer.astro';
 import { SITE } from '../config';
+import { DEFAULT_LANG } from '../lib/i18n.js';
 import photo from '../assets/robert.jpg';
 
 // the same photo in both language blocks — 2x the 96px display size, for retina.
@@ -33,7 +34,7 @@ const STACK = [
 ---
 <Base title={`About me — ${SITE.title}`} description={SITE.social.description} active="o-mnie" social={SITE.social}>
   <main class="page about">
-    <div class="lang-block" data-lang="pl">
+    <div class="lang-block" data-lang="pl" hidden={DEFAULT_LANG !== 'pl'}>
       <header class="about-header">
         <button class="avatar-button" type="button" data-lightbox-open aria-label="Powiększ zdjęcie">
           <Image class="avatar" {...AVATAR} />
@@ -90,7 +91,7 @@ const STACK = [
       </dialog>
     </div>
 
-    <div class="lang-block" data-lang="en" hidden>
+    <div class="lang-block" data-lang="en" hidden={DEFAULT_LANG !== 'en'}>
       <header class="about-header">
         <button class="avatar-button" type="button" data-lightbox-open aria-label="Enlarge photo">
           <Image class="avatar" {...AVATAR} />

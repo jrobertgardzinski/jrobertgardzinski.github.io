@@ -3,16 +3,16 @@ Feature: About page
 
   Scenario: Header and interest cards
     Given I open the about page
-    Then I see the text "Cześć, jestem Robert."
-    And I see the card "programowanie"
+    Then I see the text "Hi, I'm Robert."
+    And I see the card "programming"
     And I see the card "f1"
     And I see the card "diy"
-    And I see the card "gotowanie"
+    And I see the card "cooking"
 
   # the profiles moved out of the footer: they belong to the author, not to every page
   Scenario: Profile links
     Given I open the about page
-    Then I see the section heading "// gdzie mnie znaleźć"
+    Then I see the section heading "// where to find me"
     And the profile link "github" points to "https://github.com/jrobertgardzinski"
     And the profile link "youtube" points to "https://www.youtube.com/@robertgardzinski2927"
     And the profile links open in a new tab
@@ -21,12 +21,12 @@ Feature: About page
 
   Scenario: The stack the blog runs on
     Given I open the about page
-    Then I see the section heading "// blog napędzany przez"
-    And the stack lists "hosting" as "github pages" at "https://pages.github.com"
-    And the stack lists "domena" as "ovh" at "https://www.ovhcloud.com"
-    When I switch the language to "EN"
     Then I see the section heading "// blog powered by"
+    And the stack lists "hosting" as "github pages" at "https://pages.github.com"
     And the stack lists "domain" as "ovh" at "https://www.ovhcloud.com"
+    When I switch the language to "PL"
+    Then I see the section heading "// blog napędzany przez"
+    And the stack lists "domena" as "ovh" at "https://www.ovhcloud.com"
 
   Scenario: The stack is one item per line on a phone
     Given I open the about page on a phone
@@ -84,16 +84,16 @@ Feature: About page
     Given I open the about page
     When I click the photo
     And I press Escape
-    And I switch the language to "EN"
-    Then I see the text "Hi, I'm Robert."
+    And I switch the language to "PL"
+    Then I see the text "Cześć, jestem Robert."
     And no enlarged photo is open
 
   Scenario: The about page follows the language switch
     Given I open the about page
-    When I switch the language to "EN"
-    Then I see the text "Hi, I'm Robert."
-    And I see the card "programming"
-    And I see the card "cooking"
     When I switch the language to "PL"
     Then I see the text "Cześć, jestem Robert."
     And I see the card "programowanie"
+    And I see the card "gotowanie"
+    When I switch the language to "EN"
+    Then I see the text "Hi, I'm Robert."
+    And I see the card "programming"
