@@ -33,7 +33,7 @@ const tagChips = [...tagLangs].map(([tag, langs]) => ({
 const featuredPl = posts.find((p) => langOf(p) === 'pl');
 const featuredEn = posts.find((p) => langOf(p) === 'en');
 ---
-<Base title={`${SITE.title} — ${SITE.tagline}`} active="wpisy">
+<Base title={`${SITE.title} — ${SITE.tagline}`} active="wpisy" social={SITE.social}>
   <main class="page home">
     {featuredPl && <FeaturedCard post={featuredPl} />}
     {featuredEn && <FeaturedCard post={featuredEn} hidden />}

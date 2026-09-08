@@ -24,10 +24,21 @@ const wordmark = (c) => `
   <span style="color:${c.j}">j</span><span style="color:${c.r}">Robert</span><span style="color:${c.g}">Gardzinski</span>
 </div>`;
 
+// social preview card (Open Graph) — 1200×630, the size LinkedIn, Facebook and
+// Slack crop the least. Dark theme on purpose: a link card lands in a feed of
+// white boxes, so the Darcula tile stands out
+const ogCard = (c) => `
+<div id="shot" style="width:1200px;height:630px;background:#2B2B2B;display:grid;place-items:center;font-family:'JBM',monospace;font-weight:700">
+  <div style="text-align:center">
+    <div style="font-size:112px;line-height:1.2"><span style="color:${c.j}">j</span><span style="color:${c.r}">Robert</span><span style="color:${c.g}">Gardzinski</span></div>
+    <div style="margin-top:28px;font-size:34px;color:#A9B7C6">// java · hexagonal architecture · ddd</div>
+  </div>
+</div>`;
+
 const browser = await chromium.launch();
 
 async function shoot(html, dsf, out) {
-  const page = await browser.newPage({ viewport: { width: 1400, height: 400 }, deviceScaleFactor: dsf });
+  const page = await browser.newPage({ viewport: { width: 1400, height: 700 }, deviceScaleFactor: dsf });
   await page.setContent(`<style>${fontFace}*{margin:0}</style>${html}`);
   await page.evaluate(() => document.fonts.ready);
   await page.locator('#shot').screenshot({ path: out, omitBackground: true });
@@ -40,6 +51,7 @@ mkdirSync('brand', { recursive: true });
 await shoot(tile(COLORS.dark), 1, 'public/favicon.png');
 await shoot(tile(COLORS.light), 1, 'public/favicon-light.png');
 await shoot(tile(COLORS.dark), 2.8125, 'public/apple-touch-icon.png'); // 180×180
+await shoot(ogCard(COLORS.dark), 1, 'public/og.png'); // link preview card, see Base.astro
 
 // print-ready brand files (transparent background)
 await shoot(wordmark(COLORS.dark), 4, 'brand/wordmark-dark.png');

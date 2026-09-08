@@ -20,9 +20,25 @@ interface Props {
   counterpart?: Partial<Record<'pl' | 'en', string>>;
   /** external canonical address for syndicated content; defaults to the page's own URL */
   canonicalUrl?: string;
+  /** what the link card says when the page is shared (LinkedIn, Slack, …); defaults to title + description */
+  social?: { title?: string; description?: string };
+  /** posts are articles for Open Graph; everything else is a website */
+  ogType?: 'website' | 'article';
+  /** ISO date, only meaningful for articles */
+  published?: string;
 }
-const { title, description = SITE.description, lang = 'pl', active = '', counterpart, canonicalUrl } = Astro.props;
+const {
+  title, description = SITE.description, lang = 'pl', active = '', counterpart, canonicalUrl,
+  social = {}, ogType = 'website', published,
+} = Astro.props;
 const canonical = canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).href;
+const pageUrl = new URL(Astro.url.pathname, Astro.site).href;
+// without these LinkedIn scrapes the body and shows whatever it stumbles on
+// (the latest recipe as the title, a random excerpt underneath)
+const ogTitle = social.title ?? title;
+const ogDescription = social.description ?? description;
+const ogImage = new URL('/og.png', Astro.site).href; // tools/brand-gen.mjs
+const ogLocale = lang === 'pl' ? 'pl_PL' : 'en_US';
 ---
 <!doctype html>
 <html lang={lang} data-theme="dark">
@@ -32,6 +48,22 @@ const canonical = canonicalUrl ?? new URL(Astro.url.pathname, Astro.site).href;
     <meta name="description" content={description} />
     <title>{title}</title>
     <link rel="canonical" href={canonical} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={SITE.title} />
+    <meta property="og:locale" content={ogLocale} />
+    <meta property="og:url" content={pageUrl} />
+    <meta property="og:title" content={ogTitle} />
+    <meta property="og:description" content={ogDescription} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={SITE.title} />
+    {ogType === 'article' && published && <meta property="article:published_time" content={published} />}
+    {ogType === 'article' && <meta property="article:author" content={SITE.author} />}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={ogTitle} />
+    <meta name="twitter:description" content={ogDescription} />
+    <meta name="twitter:image" content={ogImage} />
     <link rel="alternate" type="application/rss+xml" title={SITE.title} href="/rss.xml" />
     {counterpart?.pl && <link rel="alternate" hreflang="pl" href={new URL(counterpart.pl, Astro.site)} />}
     {counterpart?.en && <link rel="alternate" hreflang="en" href={new URL(counterpart.en, Astro.site)} />}

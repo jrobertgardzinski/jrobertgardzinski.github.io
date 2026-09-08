@@ -57,6 +57,9 @@ const T = langOf(post) === 'pl'
   active="wpisy"
   counterpart={counterpart}
   canonicalUrl={post.data.canonicalUrl}
+  social={{ title: post.data.title }}
+  ogType="article"
+  published={post.data.date.toISOString()}
 >
   <main class="page post">
     <p class="back-link mono"><a href="/">{T.back}</a></p>

@@ -579,3 +579,22 @@ Then('the response contains {string}', function (text) {
 Then('the response does not contain {string}', function (text) {
   assert.ok(!this.responseText.includes(text), `Response unexpectedly contains: ${text}`);
 });
+
+// ---- link preview (Open Graph) ----
+
+Then('the link preview title is {string}', async function (title) {
+  await expect(this.page.locator('meta[property="og:title"]')).toHaveAttribute('content', title);
+});
+
+Then('the link preview description mentions {string}', async function (text) {
+  const content = await this.page.locator('meta[property="og:description"]').getAttribute('content');
+  expect(content).toContain(text);
+});
+
+Then('the link preview image is {string}', async function (url) {
+  await expect(this.page.locator('meta[property="og:image"]')).toHaveAttribute('content', url);
+});
+
+Then('the link preview type is {string}', async function (type) {
+  await expect(this.page.locator('meta[property="og:type"]')).toHaveAttribute('content', type);
+});

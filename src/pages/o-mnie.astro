@@ -31,7 +31,7 @@ const STACK = [
   { pl: 'testy', en: 'tests', name: 'cucumber + playwright', href: 'https://cucumber.io' },
 ] as const;
 ---
-<Base title={`About me — ${SITE.title}`} active="o-mnie">
+<Base title={`About me — ${SITE.title}`} description={SITE.social.description} active="o-mnie" social={SITE.social}>
   <main class="page about">
     <div class="lang-block" data-lang="pl">
       <header class="about-header">

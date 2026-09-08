@@ -4,6 +4,13 @@ export const SITE = {
   // English on purpose: it dominates search per owner's decision
   tagline: "a Java developer's blog",
   description: "A Java developer's blog — hexagonal architecture, DDD, Spring and beyond.",
+  // the link card for the home and about pages: who the author is, not what the
+  // latest post was. English, because the link travels further than Polish does
+  social: {
+    title: 'Robert Gardziński · Java developer',
+    description:
+      'Java backend: Spring, hexagonal architecture, DDD and the conviction that good code reads like good prose. Posts in Polish and English.',
+  },
   url: 'https://jrobertgardzinski.pl',
   author: 'Robert Gardziński',
   email: 'jrobertgardzinski@gmail.com',
